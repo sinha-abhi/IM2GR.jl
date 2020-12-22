@@ -1,0 +1,10 @@
+rand/
+data/
+
+test_*
+*~
+
+# eclipse files
+.cproject
+.project
+.settings/
