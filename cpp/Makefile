@@ -11,5 +11,8 @@ optim2:
 optim3:
 	$(CC) -O3 $(CCFLAGS) -o $(TARGET) src/*.cc
 	
+shared:
+	$(CC) -shared -fPIC -Iinclude src/*.cc -o $(TARGET).so
+	
 clean:
 	rm -f $(TARGET)

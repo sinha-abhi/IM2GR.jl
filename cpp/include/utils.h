@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 #include <iterator>
 #include <string>
 #include <vector>
@@ -17,6 +18,10 @@ std::vector<std::vector<T>> parse_file(int *sz, std::string f) {
     std::vector<std::vector<T>> nums;
 
     std::ifstream infile(f);
+    if (!infile.is_open()) {
+    	std::cerr << "Could not open file: " << f << std::endl;
+    	return nums;
+    }
 
     std::string sz_line;
     std::getline(infile, sz_line);

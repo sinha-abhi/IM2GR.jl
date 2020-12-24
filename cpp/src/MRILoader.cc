@@ -1,27 +1,65 @@
-#ifndef _LOAD_MRI_H_
-#define _LOAD_MRI_H_
+#include <iostream>
 
-#include <algorithm>
-#include <cmath>
+#include "MRILoader.h"
 
-typedef float (*diff_func_call)(float x, float y);
+#define DEBUG 1
 
-float mri_diff_func(float x, float y) {
+static float mri_diff_func(float x, float y) {
     return (std::min(sqrt(x) / 63.0, 1.0) - std::min(sqrt(y) / 63.0, 1.0));
 }
 
-/**
- *	im    : image
- *	im_sz : image size (x, y, z)
- *	d 	  : distance of neighbors
- *	diff  : differential function
- */
-template<typename T>
-void im2gr(Index *ei, Index *ej, float *evd, float *evi,
-           T ***im, int *im_sz, int d, diff_func_call diff) {
-    short max_x = im_sz[0] - 1;
-    short max_y = im_sz[1] - 1;
-    short max_z = im_sz[2] - 1;
+MRILoader::MRILoader(const char *f) {
+	sz = new int[3];
+	vc = 0;
+	ei = new Index[MAX_VEC_SZ];
+	ej = new Index[MAX_VEC_SZ];
+	evi = new float[MAX_VEC_SZ];
+	evd = new float[MAX_VEC_SZ];
+
+	mri = new unsigned char**[MAX_MRI_X];
+	for (unsigned i = 0; i < MAX_MRI_X; ++i) {
+		mri[i] = new unsigned char*[MAX_MRI_Y];
+		for (unsigned j = 0; j < MAX_MRI_Y; ++j)
+			mri[i][j] = new unsigned char[MAX_MRI_Z];
+	}
+
+	std::string fname(f);
+	std::vector<std::vector<unsigned char>> flat_mri(parse_file<unsigned char>(sz, fname));
+#if DEBUG
+	std::cout << "Parsed file." << std::endl;
+#endif
+
+	unflatten(mri, sz, flat_mri);
+#if DEBUG
+	std::cout << "Expanded MRI." << std::endl;
+#endif
+
+	std::cout << "Done." << std::endl;
+}
+
+MRILoader::~MRILoader() {
+	delete[] sz;
+
+	for (int i = 0; i < MAX_MRI_X; ++i) {
+		for (int j = 0; j < MAX_MRI_Y; ++j)
+			delete[] mri[i][j];
+		delete[] mri[i];
+	}
+	delete[] mri;
+
+	delete[] ei;
+	delete[] ej;
+	delete[] evi;
+	delete[] evd;
+}
+
+void MRILoader::im2gr(int d) {
+#if DEBUG
+	std::cout << "Processing image..." << std::endl;
+#endif
+    short max_x = sz[0] - 1;
+    short max_y = sz[1] - 1;
+    short max_z = sz[2] - 1;
 
     short x, y, z;
     short nx, ny, nz;
@@ -31,22 +69,13 @@ void im2gr(Index *ei, Index *ej, float *evd, float *evi,
     Index src, dest;
     Index idx_low, idx_up;
 
-    T pi, pj;
+    unsigned char pi, pj;
     float dist, dst_sq;
 
-    unsigned vc = 0;
+    vc = 0;
     for (x = 0; x <= max_x; ++x) {
-#if DEBUG
-        std::cout << "x: " << x << std::endl;
-#endif
         for (y = 0; y <= max_y; ++y) {
-#if DEBUG
-            std::cout << "y: " << y << std::endl;
-#endif
             for (z = 0; z <= max_z; ++z) {
-#if DEBUG
-                std::cout << "x: " << x << " y: " << y << " z: " << z << " vc: " << vc << std::endl;
-#endif
                 low_x = x - d;
                 low_y = y - d;
                 low_z = z - d;
@@ -88,7 +117,7 @@ void im2gr(Index *ei, Index *ej, float *evd, float *evi,
                 src.set_x(x);
                 src.set_y(y);
                 src.set_z(z);
-                pi = im[x][y][z];
+                pi = mri[x][y][z];
                 for (nx = idx_low.x(); nx <= idx_up.x(); ++nx) {
                     for (ny = idx_low.y(); ny <= idx_up.y(); ++ny) {
                         for (nz = idx_low.z(); nz <= idx_up.z(); ++nz) {
@@ -100,12 +129,12 @@ void im2gr(Index *ei, Index *ej, float *evd, float *evi,
 
                             dist = distance(src, dest);
                             dst_sq = dist * dist;
-                            pj = im[nx][ny][nz];
+                            pj = mri[nx][ny][nz];
 
                             ei[vc] = src;
                             ej[vc] = dest;
                             evd[vc] = dst_sq;
-                            evi[vc] = diff(pi, pj);
+                            evi[vc] = mri_diff_func(pi, pj);
 
                             vc++;
                         }
@@ -115,8 +144,7 @@ void im2gr(Index *ei, Index *ej, float *evd, float *evi,
         }
     }
 #if DEBUG
-    std::cout << "vc: " << vc << std::endl;
+    std::cout << "Done. vc: " << vc << std::endl;
 #endif
 }
 
-#endif /* _LOAD_MRI_H_ */
