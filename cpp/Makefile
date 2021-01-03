@@ -1,5 +1,5 @@
 CC = g++
-CCFLAGS = -Wall -Wextra -Iinclude
+CCFLAGS = -Wall -Wextra -Iinclude -std=c++17
 TARGET = load_mri
 
 all:
