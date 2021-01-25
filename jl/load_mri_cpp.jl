@@ -53,6 +53,8 @@ function image2graph_cpp(
 
     ei_jl  = unsafe_wrap(Array, ei, vc)
     ei_jl  = unsafe_wrap(Array, ei, vc)
+
+    # FIXME: this is broken
     evd_jl = unsafe_wrap(Array, evd, vc)
     evi_jl = unsafe_wrap(Array, evi, vc)
 

@@ -16,25 +16,23 @@ MRILoader::MRILoader(const char *f) {
 	evi = new float[MAX_VEC_SZ];
 	evd = new float[MAX_VEC_SZ];
 
-	mri = new unsigned char**[MAX_MRI_X];
+	mri = new uint8_t**[MAX_MRI_X];
 	for (unsigned i = 0; i < MAX_MRI_X; ++i) {
-		mri[i] = new unsigned char*[MAX_MRI_Y];
+		mri[i] = new uint8_t*[MAX_MRI_Y];
 		for (unsigned j = 0; j < MAX_MRI_Y; ++j)
-			mri[i][j] = new unsigned char[MAX_MRI_Z];
+			mri[i][j] = new uint8_t[MAX_MRI_Z];
 	}
 
 	std::string fname(f);
-	std::vector<std::vector<unsigned char>> flat_mri(parse_file<unsigned char>(sz, fname));
+	std::vector<std::vector<uint8_t>> mri_data(parse_file(sz, fname));
 #if DEBUG
 	std::cout << "Parsed file." << std::endl;
 #endif
 
-	unflatten(mri, sz, flat_mri);
+	unflatten(mri, sz, mri_data);
 #if DEBUG
 	std::cout << "Expanded MRI." << std::endl;
 #endif
-
-	std::cout << "Done." << std::endl;
 }
 
 MRILoader::~MRILoader() {
@@ -69,7 +67,7 @@ void MRILoader::im2gr(int d) {
     Index src, dest;
     Index idx_low, idx_up;
 
-    unsigned char pi, pj;
+    uint8_t pi, pj;
     float dist, dst_sq;
 
     vc = 0;

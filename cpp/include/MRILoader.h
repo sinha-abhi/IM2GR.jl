@@ -2,6 +2,7 @@
 #define _MRILOADER_H_
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 
 #include "index.h"
@@ -30,7 +31,7 @@ public:
 	void im2gr(int d);
 
 private:
-	unsigned char ***mri;
+	uint8_t ***mri;
 	int *sz;
 	unsigned vc;
 	Index *ei, *ej;

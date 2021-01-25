@@ -1,7 +1,7 @@
 #ifndef _INDEX_H_
 #define _INDEX_H_
 
-#include <sstream>
+#include <ostream>
 
 class Index {
     private:

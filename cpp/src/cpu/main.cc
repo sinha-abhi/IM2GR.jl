@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include "index.h"
 #include "MRILoader.h"
 
 int main() {
