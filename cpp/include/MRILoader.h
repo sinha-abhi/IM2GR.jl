@@ -32,10 +32,10 @@ public:
 
 private:
 	uint8_t ***mri;
-	int *sz;
-	unsigned vc;
-	Index *ei, *ej;
-	float *evi, *evd;
+	int 	  *sz;
+	unsigned   vc;
+	Index     *ei, *ej;
+	float     *evi, *evd;
 };
 
 

@@ -3,20 +3,21 @@ GPUCC = nvcc
 CCFLAGS = -Wall -Wextra -Iinclude -std=c++17
 GPUCCFLAGS = -Iinclude -std=c++17
 TARGET = load_mri
-CPUTARGET = $(TARGET)_cpu
-GPUTARGET = $(TARGET)_gpu
 
-cpu:
-	$(CC) -g $(CCFLAGS) -o $(CPUTARGET) src/cpu/*.cc
+st:
+	$(CC) -g $(CCFLAGS) -o $(TARGET)_$@ src/st/*.cc
 
-cpu_optim:
-	$(CC) -O3 $(CCFLAGS) -o $(CPUTARGET) src/cpu/*.cc
+mt:
+	$(CC) -g $(CCFLAGS) -o $(TARGET)_$@ src/mt/*.cc
 
-cpu_shared:
-	$(CC) -shared -fPIC -Iinclude src/cpu/*.cc -o $(CPUTARGET).so
-	
-gpu:
-	$(GPUCC) -g $(GPUCCFLAGS) -o $(GPUTARGET) src/gpu/*.cu
+st-o:
+	$(CC) -O3 $(CCFLAGS) -o $(TARGET)_$@ src/st/*.cc
+
+mt-o:
+	$(CC) -O3 $(CCFLAGS) -o $(TARGET)_$@ src/mt/*.cc
+
+cuda:
+	$(GPUCC) -g $(GPUCCFLAGS) -o $(TARGET)_$@ src/cuda/*.cu
 
 clean:
-	rm -f $(TARGET) $(CPUTARGET) $(GPUTARGET) $(TARGET).so $(CPUTARGET).so
+	rm -f $(TARGET)_*

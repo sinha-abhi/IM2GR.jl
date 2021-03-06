@@ -1,5 +1,11 @@
 data/
 
+# latex files
+*.tex
+*.aux
+*.out
+*.log
+
 test*
 *~
 
@@ -7,3 +13,6 @@ test*
 .cproject
 .project
 .settings/
+
+# vim files
+*.swp
