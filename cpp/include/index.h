@@ -7,28 +7,18 @@
 
 class Index {
 private:
-	short x_val, y_val, z_val;
+	unsigned int x_val, y_val, z_val;
 
 public:
-	Index() {
-		x_val = -1;
-		y_val = -1;
-		z_val = -1;
-	}
+	Index(int x = 0, int y = 0, int z = 0) : x_val(x), y_val(y), z_val(z) { }
 
-	Index(short x, short y, short z) {
-		x_val = x;
-		y_val = y;
-		z_val = z;
-	}
+	int x() { return x_val; }
+	int y() { return y_val; }
+	int z() { return z_val; }
 
-	short x() { return x_val; }
-	short y() {	return y_val; }
-	short z() {	return z_val; }
-
-	void set_x(short x) { x_val = x; }
-	void set_y(short y) { y_val = y; }
-	void set_z(short z) { z_val = z; }
+	void set_x(int x) { x_val = x; }
+	void set_y(int y) { y_val = y; }
+	void set_z(int z) { z_val = z; }
 
 	friend float distance(const Index &idx1, const Index &idx2) {
 		return (
@@ -51,16 +41,16 @@ public:
 		return o;
 	}
 
-	std::pair<Index, Index> find(unsigned d, short mx, short my, short mz) {
+	std::pair<Index, Index> find(const unsigned int d, int mx, int my, int mz) {
 		std::pair<Index, Index> bounds;
 		Index low, up;
-		short lx = x_val - d;
-		short ly = y_val - d;
-		short lz = z_val - d;
+		int lx = x_val - d;
+		int ly = y_val - d;
+		int lz = z_val - d;
 
-		short ux = x_val + d;
-		short uy = y_val + d;
-		short uz = z_val + d;
+		int ux = x_val + d;
+		int uy = y_val + d;
+		int uz = z_val + d;
 
 		if (lx < 0)
 			low.set_x(0);

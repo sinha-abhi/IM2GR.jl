@@ -9,6 +9,7 @@ TODO
 - [ ] C++
     - [x] Add support for d > 1
     - [x] Create tight upper bound for neighbor count
+    - [ ] Use NRRD reader in C++ (maybe?)
     - [ ] Multi-threaded 
 - [ ] Julia
     - [ ] Multi-threaded 

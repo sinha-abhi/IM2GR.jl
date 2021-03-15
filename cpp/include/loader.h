@@ -5,17 +5,23 @@
 #include <cctype>
 #include <cmath>
 
+#ifdef MULTITHREAD
+#include <boost/thread.hpp>
+#include <mutex>
+#endif
+
 #include "index.h"
 #include "utils.h"
 
-#define MAX_MRI_X 600
-#define MAX_MRI_Y 600
-#define MAX_MRI_Z 100
+#define MAX_X 600
+#define MAX_Y 600
+#define MAX_Z 100
 
-class MRILoader {
+class Loader {
+
 public:
-	MRILoader(const char *fname, int d);
-	~MRILoader();
+	Loader(const char *fname, int d);
+	~Loader();
 	int*     get_sz()  { return sz;  }
 	unsigned get_vc()  { return vc;  }
 	Index*   get_ei()  { return ei;  }
@@ -26,11 +32,19 @@ public:
 	void im2gr();
 
 private:
-	uint8_t ***mri;
-	int 	  *sz, d;
+	uint8_t ***data;
+	int 	  *sz;
+	const int  d;
 	unsigned   vc;
 	Index     *ei, *ej;
 	float     *evi, *evd;
+
+#ifdef MULTITHREAD
+	boost::shared_mutex d_mut;
+	std::mutex          v_mut;
+#endif
+
+	void _find_nghbrs(Index begin, Index end);
 };
 
 

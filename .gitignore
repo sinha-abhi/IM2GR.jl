@@ -6,7 +6,9 @@ data/
 *.out
 *.log
 
-test*
+# executables 
+build_graph*
+
 *~
 
 # eclipse files
