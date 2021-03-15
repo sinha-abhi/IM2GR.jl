@@ -1,9 +1,12 @@
 #include <iostream>
 
-#include "../../include/loader.h"
+#include "loader.h"
 
 int main() {
-    Loader loader("../data/lgemri.txt", 1);
+	Index<uint16_t> test;
+	std::cout << "index: " << sizeof(test) << std::endl;
+
+    Loader<short> loader("../data/lgemri.txt", 1);
 
     loader.im2gr();
 

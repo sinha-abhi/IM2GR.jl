@@ -76,8 +76,9 @@ inline void flatten(uint8_t *arr, std::vector<std::vector<uint8_t>> data) {
     std::copy(flat.begin(), flat.end(), arr);
 }
 
-inline unsigned int graph_vector_ub(int *sz, int d) {
-    int ub, n;
+inline unsigned long graph_vector_ub(int *sz, int d) {
+    unsigned long ub;
+    unsigned int n;
     int x = sz[0];
     int y = sz[1];
     int z = sz[2];

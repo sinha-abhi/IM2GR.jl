@@ -7,7 +7,8 @@ static float mri_diff_func(float x, float y) {
     return (std::min(sqrt(x) / 63.0, 1.0) - std::min(sqrt(y) / 63.0, 1.0));
 }
 
-Loader::Loader(const char *f, int dist) : d(dist) {
+template <typename T>
+Loader<T>::Loader(const char *f, int dist) : d(dist) {
     sz = new int[3];
     vc = 0;
 
@@ -29,10 +30,10 @@ Loader::Loader(const char *f, int dist) : d(dist) {
     std::cout << "Expanded Image." << std::endl;
 #endif
 
-    unsigned int upv = graph_vector_ub(sz, d);
+    unsigned long upv = graph_vector_ub(sz, d);
 
-    ei = new Index[upv];
-    ej = new Index[upv];
+    ei = new Index<T>[upv];
+    ej = new Index<T>[upv];
     evi = new float[upv];
     evd = new float[upv];
 
@@ -44,7 +45,8 @@ Loader::Loader(const char *f, int dist) : d(dist) {
 #endif
 }
 
-Loader::~Loader() {
+template <typename T>
+Loader<T>::~Loader() {
     delete[] sz;
 
     for (unsigned i = 0; i < MAX_X; ++i) {
@@ -60,26 +62,24 @@ Loader::~Loader() {
     delete[] evd;
 }
 
-void Loader::_find_nghbrs(Index begin, Index end) {
-    int x = begin.x();
-    int y = begin.y();
-    int z = begin.z();
+template <typename T>
+void Loader<T>::_find_nghbrs(Index<T> begin, Index<T> end) {
+    T max_x = end.x();
+    T max_y = end.y();
+    T max_z = end.z();
 
-    int max_x = end.x();
-    int max_y = end.y();
-    int max_z = end.z();
+    Index<T> src, dest;
+    Index<T> idx_low, idx_up;
 
-    Index src, dest;
-    Index idx_low, idx_up;
+    std::pair<Index<T>, Index<T>> bounds;
 
-    std::pair<Index, Index> bounds;
-
-    int nx, ny, nz;
+    T x, y, z;
+    T nx, ny, nz;
     uint8_t pi, pj;
     float dist, dst_sq;
-    for (x = 0; x <= max_x; ++x) {
-        for (y = 0; y <= max_y; ++y) {
-            for (z = 0; z <= max_z; ++z) {
+    for (x = begin.x(); x <= max_x; ++x) {
+        for (y = begin.y(); y <= max_y; ++y) {
+            for (z = begin.y(); z <= max_z; ++z) {
                 src.set_x(x);
                 src.set_y(y);
                 src.set_z(z);
@@ -120,7 +120,8 @@ void Loader::_find_nghbrs(Index begin, Index end) {
 #endif
 }
 
-void Loader::im2gr() {
+template <typename T>
+void Loader<T>::im2gr() {
     vc = 0;
 
 #ifdef MULTITHREAD
@@ -132,9 +133,12 @@ void Loader::im2gr() {
 #ifdef DEBUG
     std::cout << "Processing image... SINGLETHREAD" << std::endl;
 #endif
-    Index begin;
-    Index end(sz[0]-1, sz[1]-1, sz[2]-1);
+    Index<T> begin(0, 0, 0);
+    Index<T> end(sz[0]-1, sz[1]-1, sz[2]-1);
 
     _find_nghbrs(begin, end);
 #endif
 }
+
+// FIXME: this is stupid: uint16_t unsigned messes things up...
+template class Loader<short>;
