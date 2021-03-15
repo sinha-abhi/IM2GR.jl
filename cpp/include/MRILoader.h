@@ -8,31 +8,26 @@
 #include "index.h"
 #include "utils.h"
 
-#define MAX_MRI_X 576
-#define MAX_MRI_Y 576
-#define MAX_MRI_Z 88
-
-#define MAX_VEC_SZ (751321624 + 1)
-
-// TODO: pass function ptr from Julia
-//typedef float (*diff_func_call)(float x, float y);
+#define MAX_MRI_X 600
+#define MAX_MRI_Y 600
+#define MAX_MRI_Z 100
 
 class MRILoader {
 public:
-	MRILoader(const char *fname);
+	MRILoader(const char *fname, int d);
 	~MRILoader();
-	int*     get_sz()  { return sz; }
-	unsigned get_vc()  { return vc; }
-	Index*   get_ei()  { return ei; }
-	Index*   get_ej()  { return ej; }
+	int*     get_sz()  { return sz;  }
+	unsigned get_vc()  { return vc;  }
+	Index*   get_ei()  { return ei;  }
+	Index*   get_ej()  { return ej;  }
 	float*   get_evi() { return evi; }
 	float*   get_evd() { return evd; }
 
-	void im2gr(int d);
+	void im2gr();
 
 private:
 	uint8_t ***mri;
-	int 	  *sz;
+	int 	  *sz, d;
 	unsigned   vc;
 	Index     *ei, *ej;
 	float     *evi, *evd;

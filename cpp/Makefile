@@ -8,7 +8,7 @@ st:
 	$(CC) -g $(CCFLAGS) -o $(TARGET)_$@ src/st/*.cc
 
 mt:
-	$(CC) -g $(CCFLAGS) -o $(TARGET)_$@ src/mt/*.cc
+	$(CC) -g $(CCFLAGS) -o $(TARGET)_$@ src/mt/*.cc -pthread
 
 st-o:
 	$(CC) -O3 $(CCFLAGS) -o $(TARGET)_$@ src/st/*.cc

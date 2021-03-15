@@ -7,8 +7,8 @@ data in parallel. See our [research statment](research-statement.pdf).
 TODO
 ----
 - [ ] C++
-    - [ ] Add support for d > 1
-    - [ ] Create tight upper bound for neighbor count
+    - [x] Add support for d > 1
+    - [x] Create tight upper bound for neighbor count
     - [ ] Multi-threaded 
 - [ ] Julia
     - [ ] Multi-threaded 

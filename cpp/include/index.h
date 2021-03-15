@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <ostream>
+#include <utility>
 
 class Index {
 private:
@@ -48,6 +49,52 @@ public:
 	friend std::ostream& operator<<(std::ostream &o, const Index &idx) {
 		o << idx.x_val << " " << idx.y_val << " " << idx.z_val;
 		return o;
+	}
+
+	std::pair<Index, Index> find(unsigned d, short mx, short my, short mz) {
+		std::pair<Index, Index> bounds;
+		Index low, up;
+		short lx = x_val - d;
+		short ly = y_val - d;
+		short lz = z_val - d;
+
+		short ux = x_val + d;
+		short uy = y_val + d;
+		short uz = z_val + d;
+
+		if (lx < 0)
+			low.set_x(0);
+		else
+			low.set_x(lx);
+
+		if (ly < 0)
+			low.set_y(0);
+		else
+			low.set_y(ly);
+
+		if (lz < 0)
+			low.set_z(0);
+		else
+			low.set_z(lz);
+
+		if (ux > mx)
+			up.set_x(mx);
+		else
+			up.set_x(ux);
+
+		if (uy > my)
+			up.set_y(my);
+		else
+			up.set_y(uy);
+
+		if (uz > mz)
+			up.set_z(mz);
+		else
+			up.set_z(uz);
+
+		bounds = std::make_pair(low, up);
+
+		return bounds;
 	}
 };
 

@@ -3,9 +3,9 @@
 #include "MRILoader.h"
 
 int main() {
-	MRILoader loader("../data/lgemri.txt");
+	MRILoader loader("../data/lgemri.txt", 1);
 
-	loader.im2gr(1);
+	loader.im2gr();
 
 	Index *ei = loader.get_ei();
 	std::cout << ei[5] << std::endl;
