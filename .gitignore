@@ -10,6 +10,7 @@ data/
 build_graph*
 
 *~
+saxpy.cu
 
 # eclipse files
 .cproject

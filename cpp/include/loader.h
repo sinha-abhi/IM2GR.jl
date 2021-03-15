@@ -20,31 +20,31 @@
 class Loader {
 
 public:
-	Loader(const char *fname, int d);
-	~Loader();
-	int*     get_sz()  { return sz;  }
-	unsigned get_vc()  { return vc;  }
-	Index*   get_ei()  { return ei;  }
-	Index*   get_ej()  { return ej;  }
-	float*   get_evi() { return evi; }
-	float*   get_evd() { return evd; }
+    Loader(const char *fname, int d);
+    ~Loader();
+    int*     get_sz()  { return sz;  }
+    unsigned get_vc()  { return vc;  }
+    Index*   get_ei()  { return ei;  }
+    Index*   get_ej()  { return ej;  }
+    float*   get_evi() { return evi; }
+    float*   get_evd() { return evd; }
 
-	void im2gr();
+    void im2gr();
 
 private:
-	uint8_t ***data;
-	int 	  *sz;
-	const int  d;
-	unsigned   vc;
-	Index     *ei, *ej;
-	float     *evi, *evd;
+    uint8_t ***data;
+    int       *sz;
+    const int  d;
+    unsigned   vc;
+    Index     *ei, *ej;
+    float     *evi, *evd;
 
 #ifdef MULTITHREAD
-	boost::shared_mutex d_mut;
-	std::mutex          v_mut;
+    boost::shared_mutex d_mut;
+    std::mutex          v_mut;
 #endif
 
-	void _find_nghbrs(Index begin, Index end);
+    void _find_nghbrs(Index begin, Index end);
 };
 
 
