@@ -17,6 +17,8 @@
 #define MAX_Y 600
 #define MAX_Z 100
 
+using diff_fn = float (*)(float, float);
+
 template <typename T>
 class Loader {
 public:
@@ -29,7 +31,7 @@ public:
     float*    get_evi() { return evi; }
     float*    get_evd() { return evd; }
 
-    void im2gr();
+    void im2gr(diff_fn diff);
 
 private:
     uint8_t   ***data;
@@ -44,7 +46,7 @@ private:
     std::mutex          v_mut;
 #endif
 
-    void _find_nghbrs(Index<T> begin, Index<T> end);
+    void _find_nghbrs(diff_fn diff, Index<T> begin, Index<T> end);
 };
 
 
