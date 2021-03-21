@@ -2,7 +2,6 @@
 
 #include "loader.h"
 
-// TODO: make ops atomic for mt
 template <typename T>
 Loader<T>::Loader(const char *f, int dist) : d(dist) {
   sz = new int[3];

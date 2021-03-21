@@ -26,27 +26,21 @@ inline std::vector<std::vector<uint8_t>> parse_file(int *sz, std::string f) {
 
   std::string sz_line;
   std::getline(infile, sz_line);
-
   std::string _tmp;
   std::istringstream szss(sz_line);
   for (short i = 0; i < 3 && std::getline(szss, _tmp, ' '); ++i)
     sz[i] = atoi(_tmp.c_str());
 
   std::string line;
+  std::vector<uint8_t> _nums;
   while (getline(infile, line)) {
     std::istringstream ss(line);
-
     std::istream_iterator<std::string> begin(ss);
     std::istream_iterator<std::string> end;
-
     std::vector<std::string> s_nums(begin, end);
 
-    std::vector<uint8_t> _nums;
     _nums.resize(s_nums.size());
-
-    std::transform(s_nums.begin(), s_nums.end(),
-             _nums.begin(), __stousi);
-
+    std::transform(s_nums.begin(), s_nums.end(), _nums.begin(), __stousi);
     nums.push_back(_nums);
   }
 
