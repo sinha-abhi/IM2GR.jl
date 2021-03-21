@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "loader.h"
+#include "cpu/loader.h"
 
 template <typename T>
 Loader<T>::Loader(const char *f, int dist) : d(dist) {

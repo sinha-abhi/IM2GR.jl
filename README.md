@@ -6,7 +6,7 @@ data in parallel. See our [research statment](docs/rs/research-statement.pdf).
 
 TODO
 ----
-- [ ] **Fix Makefile**
+- [x] Fix Makefile
 - [ ] C++
   - [ ] Add support for d > 1
     - [ ] OOM issues

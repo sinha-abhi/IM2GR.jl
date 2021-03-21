@@ -1,23 +1,111 @@
-CC = g++
-GPUCC = nvcc
-CCFLAGS = -Wall -Wextra -Iinclude -std=c++17
-GPUCCFLAGS = -Iinclude -std=c++17
-TARGET = build_graph
+# Makefile for all C++ components of im2gr 
+CC := g++
+GPUCC := nvcc
+CXXFLAGS := -Wall -Wextra -std=c++17
+GPUCXXFLAGS := -std=c++17
 
-st:
-	$(CC) -g $(CCFLAGS) -DDEBUG -o $(TARGET)_$@ src/cpu/*.cc
+DEBUG :=
+OPT :=
 
-mt:
-	$(CC) -g $(CCFLAGS) -DMULTITHREAD -DDEBUG -o $(TARGET)_$@ src/cpu/*.cc -pthread
+ifdef DEBUG
+  CXXFLAGS += -g -DDEBUG
+  GPUCXXFLAGS += -g -DDEBUG
+endif
 
-st-o:
-	$(CC) -O3 $(CCFLAGS) -o $(TARGET)_$@ src/cpu/*.cc
+ifdef OPT
+  CXXFLAGS += -O2
+endif
 
-mt-o:
-	$(CC) -O3 $(CCFLAGS) -DMULTITHREAD -o $(TARGET)_$@ src/mt/*.cc
+# ---- directories ----
+SRCDIR := im2gr/cpp/src
+INCDIR := im2gr/cpp/include
 
-cuda:
-	$(GPUCC) -g $(GPUCCFLAGS) -o $(TARGET)_$@ src/cuda/*.cu
+TESTSRCDIR := test/cpp/src
+TESTINCDIR := test/cpp/include
+
+BMSRCDIR := benchmark/cpp/src
+BMINCDIR := benchmark/cpp/include
+
+BIN := bin
+
+IM2GRGOALS := im2gr-all im2gr-st im2gr-mt im2gr-cuda
+BMGOALS := benchmark-all benchmark-st benchmark-mt benchmark-cuda
+TESTGOALS := test-all test-st test-mt test-cuda
+
+INCPATH = -I$(INCDIR)
+TESTINCPATH = -I$(TESTINCDIR)
+BMINCPATH = -I$(BMINCDIR)
+
+# ----
+CXXFLAGS += $(INCPATH)
+GPUCXXFLAGS += $(INCPATH)
+
+__SRCCPU := $(SRCDIR)/cpu/*.cc
+__SRCCPU += $(filter-out $(SRCDIR)/cpu/main.cc, $(__TESTSRCCPU))
+
+__SRCGPU := $(SRCDIR)/cuda/*.cu
+__SRCGPU += $(filter-out $(SRCDIR)/cuda/main.cu, $(__TESTSRCGPU))
+
+# ---- all ----
+all: im2gr-all test-all benchmark-all
+
+list:
+	@echo "im2gr:"
+	@echo "\t$(IM2GRGOALS)"
+	@echo "benchmark:"
+	@echo "\t$(BMGOALS)"
+	@echo "test:"
+	@echo "\t$(TESTGOALS)"
 
 clean:
-	rm -f $(TARGET)_*
+	rm -rf bin
+
+# ---- im2gr ----
+im2gr-all: im2gr-st im2gr-mt im2gr-cuda
+
+im2gr-st: | $(BIN)
+	$(CC) $(CXXFLAGS) -o $(BIN)/$@ $(SRCDIR)/cpu/*.cc
+
+im2gr-mt: | $(BIN)
+	$(CC) $(CXXFLAGS) -DMULTITHREAD -o $(BIN)/$@ $(SRCDIR)/cpu/*.cc
+
+im2gr-cuda: | $(BIN)
+	$(GPUCC) $(GPUCXXFLAGS) -o $(BIN)/$@ $(SRCDIR)/cuda/*.cu
+
+# ---- tests -----
+test-all: test-st test-mt test-cuda
+
+test-st: | $(BIN)
+	$(CC) $(CXXFLAGS) $(TESTINCPATH)/cpu -o $(BIN)/im2gr-$@ \
+    $(__SRCCPU) $(TESTSRCDIR)/cpu/*-st.cc
+
+test-mt: | $(BIN)
+	$(CC) $(CXXFLAGS) $(TESTINCPATH)/cpu -DMULTITHREAD -o $(BIN)/im2gr-$@ \
+    $(__SRCCPU) $(TESTSRCDIR)/cpu/*-mt.cc -pthread
+
+test-cuda: | $(BIN)
+	$(GPUCC) $(GPUCXXFLAGS) $(TESTINCPATH)/cuda -o $(BIN)/im2gr-$@ \
+    $(__SRCGPU) $(TESTSRCDIR)/cuda/*.cu
+
+# ---- benchmark ----
+benchmark-all: benchmark-st benchmark-mt benchmark-cuda
+
+benchmark-st: | $(BIN)
+	$(CC) $(CXXFLAGS) $(BMINCPATH)/cpu -o $(BIN)/im2gr-$@ \
+    $(__SRCCPU) $(BMSRCDIR)/cpu/*-st.cc
+
+benchmark-mt: | $(BIN)
+	$(CC) $(CXXFLAGS) $(BMINCPATH)/cpu -DMULTITHREAD -o $(BIN)/im2gr-$@ \
+    $(__SRCCPU) $(BMSRCDIR)/cpu/*-mt.cc -pthread
+
+benchmark-cuda: | $(BIN)
+	$(GPUCC) $(GPUCXXFLAGS) $(BMINCPATH)/cuda -o $(BIN)/im2gr-$@ \
+    $(__SRCPU) $(BMSRCDIR)/cuda/*.cu
+
+# ----
+$(BIN):
+	mkdir -p $@
+
+
+.PHONY: all im2gr-all test-all benchmark-all clean list
+

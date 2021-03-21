@@ -8,8 +8,8 @@ lgemri.*
 *.out
 *.log
 
-# executables 
-build_graph*
+# executables
+bin/
 
 *~
 saxpy.cu
