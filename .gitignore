@@ -13,7 +13,7 @@ bin/
 
 *~
 saxpy.cu
-im2gr/jl/notes.md
+src/notes.md
 
 # eclipse files
 .cproject
