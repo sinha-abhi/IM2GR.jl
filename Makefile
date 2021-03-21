@@ -77,30 +77,30 @@ test-all: test-st test-mt test-cuda
 
 test-st: | $(BIN)
 	$(CC) $(CXXFLAGS) $(TESTINCPATH)/cpu -o $(BIN)/im2gr-$@ \
-    $(__SRCCPU) $(TESTSRCDIR)/cpu/*-st.cc
+            $(__SRCCPU) $(TESTSRCDIR)/cpu/*-st.cc
 
 test-mt: | $(BIN)
 	$(CC) $(CXXFLAGS) $(TESTINCPATH)/cpu -DMULTITHREAD -o $(BIN)/im2gr-$@ \
-    $(__SRCCPU) $(TESTSRCDIR)/cpu/*-mt.cc -pthread
+            $(__SRCCPU) $(TESTSRCDIR)/cpu/*-mt.cc -pthread
 
 test-cuda: | $(BIN)
 	$(GPUCC) $(GPUCXXFLAGS) $(TESTINCPATH)/cuda -o $(BIN)/im2gr-$@ \
-    $(__SRCGPU) $(TESTSRCDIR)/cuda/*.cu
+            $(__SRCGPU) $(TESTSRCDIR)/cuda/*.cu
 
 # ---- benchmark ----
 benchmark-all: benchmark-st benchmark-mt benchmark-cuda
 
 benchmark-st: | $(BIN)
 	$(CC) $(CXXFLAGS) $(BMINCPATH)/cpu -o $(BIN)/im2gr-$@ \
-    $(__SRCCPU) $(BMSRCDIR)/cpu/*-st.cc
+            $(__SRCCPU) $(BMSRCDIR)/cpu/*-st.cc
 
 benchmark-mt: | $(BIN)
 	$(CC) $(CXXFLAGS) $(BMINCPATH)/cpu -DMULTITHREAD -o $(BIN)/im2gr-$@ \
-    $(__SRCCPU) $(BMSRCDIR)/cpu/*-mt.cc -pthread
+            $(__SRCCPU) $(BMSRCDIR)/cpu/*-mt.cc -pthread
 
 benchmark-cuda: | $(BIN)
 	$(GPUCC) $(GPUCXXFLAGS) $(BMINCPATH)/cuda -o $(BIN)/im2gr-$@ \
-    $(__SRCPU) $(BMSRCDIR)/cuda/*.cu
+            $(__SRCPU) $(BMSRCDIR)/cuda/*.cu
 
 # ----
 $(BIN):
