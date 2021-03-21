@@ -2,15 +2,18 @@ Image Graphs
 ============
 
 An exploration of algorithms for constructing graphs derived from image-like
-data in parallel. See our [research statment](research-statement.pdf).
+data in parallel. See our [research statment](docs/rs/research-statement.pdf).
 
 TODO
 ----
 - [ ] C++
-    - [x] Add support for d > 1
-    - [x] Create tight upper bound for neighbor count
-    - [ ] Use NRRD reader in C++ (maybe?)
-    - [ ] Multi-threaded 
+  - [ ] Add support for d > 1
+  - [ ] OOM issues
+  - [x] Create tight upper bound for neighbor count
+  - [ ] Use NRRD reader in C++ (maybe?)
+  - [ ] Multi-threaded 
 - [ ] Julia
-    - [ ] Multi-threaded 
+  - [ ] Multi-threaded 
 - [ ] CUDA
+- [ ] Benchmarks 
+- [ ] Correctness and Unit Tests
