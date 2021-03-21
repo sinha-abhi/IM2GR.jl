@@ -1,0 +1,4 @@
+name = "im2gr"
+uuid = "d59ffd42-b4b3-4e8d-898a-207370115e91"
+authors = ["Abhi Sinha <sinha45@purdue.edu>"]
+version = "0.1.0"

@@ -17,8 +17,8 @@ ifdef OPT
 endif
 
 # ---- directories ----
-SRCDIR := im2gr/cpp/src
-INCDIR := im2gr/cpp/include
+SRCDIR := src/cpp/src
+INCDIR := src/cpp/include
 
 TESTSRCDIR := test/cpp/src
 TESTINCDIR := test/cpp/include
