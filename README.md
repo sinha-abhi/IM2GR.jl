@@ -8,7 +8,7 @@ TODO
 ----
 - [ ] C++
   - [ ] Add support for d > 1
-  - [ ] OOM issues
+    - [ ] OOM issues
   - [x] Create tight upper bound for neighbor count
   - [ ] Use NRRD reader in C++ (maybe?)
   - [ ] Multi-threaded 
