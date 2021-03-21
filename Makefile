@@ -100,7 +100,7 @@ benchmark-mt: | $(BIN)
 
 benchmark-cuda: | $(BIN)
 	$(GPUCC) $(GPUCXXFLAGS) $(BMINCPATH)/cuda -o $(BIN)/im2gr-$@ \
-            $(__SRCPU) $(BMSRCDIR)/cuda/*.cu
+            $(__SRCGPU) $(BMSRCDIR)/cuda/*.cu
 
 # ----
 $(BIN):
