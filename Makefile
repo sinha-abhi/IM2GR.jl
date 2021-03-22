@@ -40,11 +40,11 @@ BMINCPATH = -I$(BMINCDIR)
 CXXFLAGS += $(INCPATH)
 GPUCXXFLAGS += $(INCPATH)
 
-__SRCCPU := $(SRCDIR)/cpu/*.cc
-__SRCCPU += $(filter-out $(SRCDIR)/cpu/main.cc, $(__TESTSRCCPU))
+__SRCCPU := $(wildcard $(SRCDIR)/cpu/*.cc)
+__SRCCPU := $(filter-out $(SRCDIR)/cpu/main.cc, $(__SRCCPU))
 
-__SRCGPU := $(SRCDIR)/cuda/*.cu
-__SRCGPU += $(filter-out $(SRCDIR)/cuda/main.cu, $(__TESTSRCGPU))
+__SRCGPU := $(wildcard $(SRCDIR)/cuda/*.cu)
+__SRCGPU := $(filter-out $(SRCDIR)/cuda/main.cu, $(__SRCGPU))
 
 # ---- all ----
 all: im2gr-all test-all benchmark-all
