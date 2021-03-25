@@ -50,6 +50,8 @@ __SRCGPU := $(filter-out $(SRCDIR)/cuda/main.cu, $(__SRCGPU))
 all: im2gr-all test-all benchmark-all
 
 list:
+	@echo "flags:"
+	@echo "\tOPT DEBUG"
 	@echo "im2gr:"
 	@echo "\t$(IM2GRGOALS)"
 	@echo "benchmark:"

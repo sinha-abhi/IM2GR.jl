@@ -25,7 +25,7 @@ function im2gr!(
   resize!(image.evd, image.vc)
   resize!(image.evi, image.vc)
 
-  nothing
+  return image.ei, image.ej, image.evd, image.evi
 end
 
 # udpate image -- new data or new d or both

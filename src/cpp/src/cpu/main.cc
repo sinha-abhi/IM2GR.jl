@@ -4,13 +4,15 @@
 #include "cpu/loader.h"
 
 int main(int argc, char **argv) {
-  int d = 1;
-  if (argc < 2)
-    std::cerr << "Defaulting to d = " << d << std::endl;
-  else
-    d = atoi(argv[1]);
+  if (argc < 3) {
+    std::cerr << "usage: " << argv[0] << " <data path> <d>" << std::endl;
+    exit(EXIT_FAILURE);
+  }
 
-  Loader<short> loader("data/lgemri.txt", d);
+  std::string path(argv[1]);
+  int d = atoi(argv[1]);
+
+  Loader<short> loader(path, d);
   loader.im2gr(mri_diff_func);
   return 0;
 }

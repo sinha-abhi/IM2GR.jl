@@ -22,14 +22,14 @@ using diff_fn = float (*)(float, float);
 template <typename T>
 class Loader {
 public:
-  Loader(const char *fname, int d);
+  Loader(std::string fname, int d);
   ~Loader();
   int*      get_sz()  { return sz;  }
   unsigned  get_vc()  { return vc;  }
   Index<T>* get_ei()  { return ei;  }
   Index<T>* get_ej()  { return ej;  }
-  float*    get_evi() { return evi; }
   float*    get_evd() { return evd; }
+  float*    get_evi() { return evi; }
 
   void im2gr(diff_fn diff);
 
@@ -39,7 +39,7 @@ private:
   const int    d;
   unsigned     vc;
   Index<T>    *ei, *ej;
-  float       *evi, *evd;
+  float       *evd, *evi;
 
 #ifdef MULTITHREAD
   boost::shared_mutex d_mut;

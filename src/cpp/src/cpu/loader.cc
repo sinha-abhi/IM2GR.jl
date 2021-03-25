@@ -3,7 +3,7 @@
 #include "cpu/loader.h"
 
 template <typename T>
-Loader<T>::Loader(const char *f, int dist) : d(dist) {
+Loader<T>::Loader(std::string f, int dist) : d(dist) {
   sz = new int[3];
   vc = 0;
 
@@ -14,8 +14,7 @@ Loader<T>::Loader(const char *f, int dist) : d(dist) {
       data[i][j] = new uint8_t[MAX_Z];
   }
 
-  std::string fname(f);
-  auto _data(parse_file(sz, fname));
+  auto _data(parse_file(sz, f));
 #ifdef DEBUG
   std::cout << "Parsed file." << std::endl;
 #endif
@@ -29,8 +28,8 @@ Loader<T>::Loader(const char *f, int dist) : d(dist) {
 
   ei = new Index<T>[upv];
   ej = new Index<T>[upv];
-  evi = new float[upv];
   evd = new float[upv];
+  evi = new float[upv];
 
 #ifdef DEBUG
   std::cout << "Image size: " << sz[0] << ", "
@@ -54,8 +53,8 @@ Loader<T>::~Loader() {
 
   delete[] ei;
   delete[] ej;
-  delete[] evi;
   delete[] evd;
+  delete[] evi;
 }
 
 template <typename T>
