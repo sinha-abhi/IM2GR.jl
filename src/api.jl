@@ -20,10 +20,11 @@ function im2gr!(
   (mode == CUDA) && load_st!(image, diff_fn, track)
 
   # reshape vectors to actual length
-  resize!(image.ei, image.vc)
-  resize!(image.ej, image.vc)
-  resize!(image.evd, image.vc)
-  resize!(image.evi, image.vc)
+  vc = image.vc
+  resize!(image.ei, vc)
+  resize!(image.ej, vc)
+  resize!(image.evd, vc)
+  resize!(image.evi, vc)
 
   return image.ei, image.ej, image.evd, image.evi
 end
