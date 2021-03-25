@@ -1,4 +1,4 @@
-name = "im2gr"
+name = "IM2GR"
 uuid = "d59ffd42-b4b3-4e8d-898a-207370115e91"
 authors = ["Abhi Sinha <sinha45@purdue.edu>"]
 version = "0.1.0"
@@ -10,3 +10,4 @@ LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 NRRD = "9bb6cfbd-7763-5393-b1b5-1c8e09872146"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

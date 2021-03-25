@@ -1,4 +1,4 @@
-module im2gr
+module IM2GR
 
 using FileIO
 using Images
@@ -17,6 +17,9 @@ include("api.jl")
 export
   AbstractImage,
   Image,
-  im2gr!
+  ConstructionMode,
+
+  im2gr!,
+  update_image!
 
 end # module

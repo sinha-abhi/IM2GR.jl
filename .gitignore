@@ -15,6 +15,7 @@ bin/
 saxpy.cu
 src/notes.md
 src/old
+notebooks
 
 # eclipse files
 .cproject
