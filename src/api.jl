@@ -5,7 +5,7 @@ function im2gr!(
   image::AbstractImage{T},
   mode::ConstructionMode;
   diff_fn::Function = __default_diff_fn,
-  track::Bool = true
+  track::Bool = false
 ) where T <: Unsigned
   if track
     sz = size(image.data)
