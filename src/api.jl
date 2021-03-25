@@ -34,11 +34,9 @@ function update_image!(
   data::Union{Nothing, AbstractArray{T}} = nothing,
   d::Union{Nothing, Int} = nothing
 )::Bool where T <: Unsigned
-  # this is kinda crappy
-  udata = !isequal(image.data, data)
-  ud = image.d != d
-  update = (d != nothing) || (data != nothing)
-  update = update && (udata && ud)
+  udata = (data != nothing) && !isequal(image.data, data)
+  ud = (d != nothing) && (image.d != d)
+  update = udata || ud
   if update
     udata && (image.data = data)
     ud && (image.d = d)
