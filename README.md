@@ -8,6 +8,8 @@ data in parallel. See our [research statment](docs/rs/research-statement.pdf).
 
 ## Julia
 ```julia
+using IM2GR
+
 data= <data source>
 diff_fn = <image diff func>
 d = <search distance>
