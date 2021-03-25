@@ -9,7 +9,7 @@ data in parallel. See our [research statment](docs/rs/research-statement.pdf).
 ## Julia
 ```julia
 data= <data source>
-diff_fn = <image diff function>
+diff_fn = <image diff func>
 d = <search distance>
 image = Image{UInt8}(data, diff_fn, d)
 ei, ej, evd, evi = im2gr!(image, <construction mode>, track=true)
