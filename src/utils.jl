@@ -25,26 +25,3 @@ function graph_vector_ub(dims::Tuple, d::Int)::UInt
   ub
 end
 
-function update_image!(
-  image::AbstractImage{T};
-  data::Union{Nothing, AbstractArray{T}} = nothing,
-  d::Union{Nothing, Int} = nothing
-)::Bool where T <: Unsigned
-  udata = !isequal(image.data, data)
-  ud = image.d != d
-  update = (d != nothing) || (data != nothing)
-  update = update && (udata && ud)
-  if update
-    udata && (image.data = data)
-    ud && (image.d = d)
-
-    ub = graph_vector_ub(size(image.data), image.d)
-    image.ub = ub
-    image.ei = Vector{Int}(undef, ub)
-    image.ej = Vector{Int}(undef, ub)
-    image.evd = Vector{Int}(undef, ub)
-    image.evi = Vector{Int}(undef, ub)
-  end
-
-  update
-end
