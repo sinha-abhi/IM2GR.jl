@@ -50,11 +50,13 @@ function construct_graph!(
   dd = d * oneunit(cf)
   imap = LinearIndices(data)
 
+  # TODO: this is broken (i think)
   for idx in lo : hi 
     idx_lower = max(cf, idx - dd)
     idx_upper = min(cl, idx + dd)
     src = imap[idx]
     _pi = data[idx]
+    # TODO: this is prolly actually broken
     for nidx in idx_lower : idx_upper
       dst = imap[nidx]
       (src == dst) && continue
@@ -91,10 +93,17 @@ function load_mt!(
   step = ceil(typeof(lf), ll / nt)
 
   # allocate space for worker threads
-  eis = [zeros(Int, 0) for i = 1:nt]
-  ejs = [zeros(Int, 0) for i = 1:nt]
-  evds = [zeros(0) for i = 1:nt]
-  evis = [zeros(0) for i = 1:nt]
+  eis = Vector{Vector{Int}}(undef, nt)
+  ejs = Vector{Vector{Int}}(undef, nt)
+  evds = Vector{Vector{Float64}}(undef, nt)
+  evis = Vector{Vector{Float64}}(undef, nt)
+  for i = 1 : nt
+    eis[i] = Int[]
+    ejs[i] = Int[]
+    evds[i] = Float64[]
+    evis[i] = Float64[]
+  end
+
   @sync for t = 1 : nt
     start = lf + step * (t-1)
     stop = step + step * (t-1)
