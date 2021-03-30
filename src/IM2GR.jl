@@ -8,6 +8,8 @@ using NRRD
 using Printf
 using ProgressMeter
 
+import Base.Threads.@spawn
+
 include("types.jl")
 include("utils.jl")
 include("loader.jl")
