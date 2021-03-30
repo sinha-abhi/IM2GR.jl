@@ -3,8 +3,8 @@
 # probably don't use `track` when benchmarking
 function im2gr!(
   image::AbstractImage{T},
-  mode::ConstructionMode;
-  diff_fn::Function = __default_diff_fn,
+  mode::ConstructionMode,
+  diff_fn::Function = __default_diff_fn;
   track::Bool = false
 ) where T <: Unsigned
   if track
@@ -15,16 +15,19 @@ function im2gr!(
     @printf("Loading image... %s\n", mode)
   end
 
-  (mode == SingleThread) && load_st!(image, diff_fn, track)
-  (mode == MultiThread) && load_st!(image, diff_fn, track)
-  (mode == CUDA) && load_st!(image, diff_fn, track)
+  if mode == SingleThread
+    load_st!(image, diff_fn, track)
 
-  # reshape vectors to actual length
-  vc = image.vc
-  resize!(image.ei, vc)
-  resize!(image.ej, vc)
-  resize!(image.evd, vc)
-  resize!(image.evi, vc)
+    # reshape vectors to actual length
+    vc = image.vc
+    resize!(image.ei, vc)
+    resize!(image.ej, vc)
+    resize!(image.evd, vc)
+    resize!(image.evi, vc)
+  end
+
+  (mode == MultiThread) && load_mt!(image, diff_fn, track)
+  (mode == CUDA) && load_cuda!(image, diff_fn, track)
 
   return image.ei, image.ej, image.evd, image.evi
 end
