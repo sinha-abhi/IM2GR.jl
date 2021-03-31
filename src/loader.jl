@@ -45,10 +45,14 @@ function construct_graph!(
   ei::Vector{Int}, ej::Vector{Int},
   evd::Vector{Float64}, evi::Vector{Float64},
   data::AbstractArray{T}, diff_fn::Function,
-  d, lo, hi, cf, cl 
+  d, start, stop 
 ) where T <: Unsigned
+  R = CartesianIndices(data)
+  imap = LinearIndices(R)
+
+  cf, cl = first(R), last(R)
+  lo, hi = R[start], R[stop]
   dd = d * oneunit(cf)
-  imap = LinearIndices(data)
 
   # TODO: this is broken (i think)
   for idx in lo : hi 
@@ -115,7 +119,7 @@ function load_mt!(
     @spawn construct_graph!(
       eis[t], ejs[t], evds[t], evis[t],
       data, diff_fn, image.d, 
-      R[start], R[stop], cf, cl
+      start, stop
     )
   end
 
