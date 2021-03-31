@@ -7,7 +7,7 @@ import IM2GR: graph_vector_ub
   @test graph_vector_ub((576, 576, 88), 1) == 751321800
 end
 
-@testset "update image" begin
+@testset "update" begin
   tz = zeros(Unsigned, 3, 3, 3)
   image = Image{Unsigned}(tz, 1)
   @test update_image!(image, data=tz, d=1) == false

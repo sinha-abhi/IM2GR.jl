@@ -45,35 +45,27 @@ function construct_graph!(
   ei::Vector{Int}, ej::Vector{Int},
   evd::Vector{Float64}, evi::Vector{Float64},
   data::AbstractArray{T}, diff_fn::Function,
-  d, start, stop 
+  d, cf, cl, bstart, bstop
 ) where T <: Unsigned
-  R = CartesianIndices(data)
-  imap = LinearIndices(R)
+  imap = LinearIndices(data)
 
-  cf, cl = first(R), last(R)
-  lo, hi = R[start], R[stop]
-  dd = d * oneunit(cf)
-
-  # TODO: this is broken (i think)
-  for idx in lo : hi 
-    idx_lower = max(cf, idx - dd)
-    idx_upper = min(cl, idx + dd)
+  for idx in bstart : bstop
+    idx_low = max(cf, idx-d)
+    idx_up = min(cl, idx+d)
     src = imap[idx]
-    _pi = data[idx]
-    # TODO: this is prolly actually broken
-    for nidx in idx_lower : idx_upper
-      dst = imap[nidx]
-      (src == dst) && continue
-      dist = norm(Tuple(idx - nidx))^2
-      pj = data[nidx]
+    pi = data[idx]
+    for nidx in idx_low : idx_up
+        dst = imap[nidx]
+        (src == dst) && continue
+        dist = norm(Tuple(idx - nidx))^2
+        pj = data[nidx]
 
-      push!(ei, src)
-      push!(ej, dst)
-      push!(evd, dist)
-      push!(evi, diff_fn(_pi, pj))
+        push!(ei, src)
+        push!(ej, dst)
+        push!(evd, dist)
+        push!(evi, diff_fn(pi, pj))
     end
   end
-
   nothing 
 end
 
@@ -82,44 +74,46 @@ function load_mt!(
   diff_fn::Function,
   track::Bool
 ) where T <: Unsigned
-  # https://julialang.org/blog/2019/07/multithreading/#thread-local_state
   data = image.data
 
-  R = CartesianIndices(data)
-  imap = LinearIndices(R)
-
-  cf, cl = first(R), last(R)
-  lf, ll = first(imap), last(imap)
-  dd = image.d * oneunit(lf)
-
   nt = Threads.nthreads()
+  R = CartesianIndices(data)
+  cf, cl = first(R), last(R)
+  dd = image.d * oneunit(cf)
 
-  step = ceil(typeof(lf), ll / nt)
+  # make as large blocks as we can along the longest dimension
+  sz, dim = findmax(size(data))
+  bsz = sz < nt ? 1 : ceil(Int, sz / nt)
+  nb = Int(sz / bsz)
 
-  # allocate space for worker threads
-  eis = Vector{Vector{Int}}(undef, nt)
-  ejs = Vector{Vector{Int}}(undef, nt)
-  evds = Vector{Vector{Float64}}(undef, nt)
-  evis = Vector{Vector{Float64}}(undef, nt)
-  for i = 1 : nt
+  # allocate memory for threads
+  # https://julialang.org/blog/2019/07/multithreading/#thread-local_state
+  eis = Vector{Vector{Int}}(undef, nb)
+  ejs = Vector{Vector{Int}}(undef, nb)
+  evds = Vector{Vector{Float64}}(undef, nb)
+  evis = Vector{Vector{Float64}}(undef, nb)
+  for i in 1 : nb
     eis[i] = Int[]
     ejs[i] = Int[]
     evds[i] = Float64[]
     evis[i] = Float64[]
   end
 
-  @sync for t = 1 : nt
-    start = lf + step * (t-1)
-    stop = step + step * (t-1)
-    start = start > ll ? ll : start 
-    stop = stop > ll ? ll : stop
-
-    # f = max(lf, start - dd)
-    # l = min(ll, stop + dd)
+  @sync for block in 1 : nb
+    start = 1 + bsz * (block-1)
+    stop = bsz + bsz * (block-1)
+    stop = stop > cl[dim] ? cl[dim] : stop
+    bstart = Vector{Int}(undef, 3)
+    bstop = Vector{Int}(undef, 3)
+    for i in 1 : 3
+      bstart[i] = dim == i ? start : 1
+      bstop[i] = dim == i ? stop : cl[i]
+    end
+    bstart = CartesianIndex(Tuple(bstart))
+    bstop = CartesianIndex(Tuple(bstop))
     @spawn construct_graph!(
-      eis[t], ejs[t], evds[t], evis[t],
-      data, diff_fn, image.d, 
-      start, stop
+      eis[block], ejs[block], evds[block], evis[block],
+      data, diff_fn, dd, cf, cl, bstart, bstop
     )
   end
 

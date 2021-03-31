@@ -16,7 +16,6 @@ function run_loader_tests(mode::ConstructionMode, data, d, ret)
   for t = 1 : length(data)
     image = Image{UInt8}(data[t], d[t])
     im2gr!(image, mode)
-    # @printf("expected: %d, got %d\n", Int(ret[t, 1]), length(image.ei))
     @test begin 
       length(image.ei) == Int(ret[t, 1]) && 
       length(image.ej) == Int(ret[t, 1])
@@ -30,11 +29,22 @@ function run_loader_tests(mode::ConstructionMode, data, d, ret)
   nothing
 end
 
-@testset "singlethread" begin
+@testset "single" begin
   run_loader_tests(IM2GR.SingleThread, data, d, ret)
 end
 
-@testset "multithread" begin
+@testset "multi" begin
   run_loader_tests(IM2GR.MultiThread, data, d, ret)
 end
 
+@testset "consistency" begin
+  fake = rand(UInt8, (144, 144, 22))
+  image = Image{UInt8}(fake, 1)
+  sei, sej, sevd, sevi = im2gr!(image, IM2GR.SingleThread)
+
+  update_image!(image, data=fake, d=1)
+  mei, mej, mevd, mevi = im2gr!(image, IM2GR.MultiThread)
+
+  @test length(sei) == length(mei) && length(sej) == length(mej)
+  @test norm(sevd) ≈ norm(mevd) && norm(sevi) ≈ norm(mevi)
+end
