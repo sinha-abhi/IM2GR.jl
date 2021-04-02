@@ -1,3 +1,7 @@
+# ***** C++ files (for now) *****
+cpp/
+Makefile
+
 # real data files
 laendo.*
 lgemri.*

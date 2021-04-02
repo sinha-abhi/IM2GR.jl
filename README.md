@@ -19,7 +19,7 @@ image = im2gr!(data, d, <construction mode>, diff_fn, track=true)
 The result vectors are stored in `image`.
 
 ## C++
-_On the back burner till Julia implementation is finished._
+_Temporarily hidden: On the back burner till Julia implementation is finished._
 ### Executable
 ```bash
 make im2gr-<mode> && ./bin/im2gr-<mode> <data path> <d>
