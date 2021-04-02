@@ -1,43 +1,55 @@
 # load functions
 
 # ********** load image -- singlethread **********
-function load_st!(
-  image::AbstractImage{T},
+function build_st(
+  data::AbstractArray{T}, d::Int,
   diff_fn::Function,
   track::Bool
 ) where T <: Unsigned
-  iter = CartesianIndices(image.data)
-  imap = LinearIndices(iter)
+  R = CartesianIndices(data)
+  imap = LinearIndices(R)
 
-  idx_first, idx_last = first(iter), last(iter)
-  dd = image.d * oneunit(idx_first)
+  cf, cl = first(R), last(R)
+  dd = d * oneunit(cf)
 
-  track && (p = Progress(length(iter)))
-  _vc = 1
-  for idx in iter
-    idx_lower = max(idx_first, idx - dd)
-    idx_upper = min(idx_last, idx + dd)
+  # allocate memory
+  ub = graph_vector_ub(size(data), d)
+  ei = Vector{Int}(undef, ub)
+  ej = Vector{Int}(undef, ub)
+  evd = Vector{Float64}(undef, ub)
+  evi = Vector{Float64}(undef, ub)
+
+  track && (p = Progress(length(R)))
+  vc = 1
+  for idx in R
+    idx_lower = max(cf, idx-dd)
+    idx_upper = min(cl, idx+dd)
     src = imap[idx]
-    _pi = image.data[idx]
+    _pi = data[idx]
     for nidx in idx_lower : idx_upper
       dst = imap[nidx]
       (src == dst) && continue
       dist = norm(Tuple(idx - nidx))^2
-      pj = image.data[nidx]
+      pj = data[nidx]
 
-      image.ei[_vc] = src
-      image.ej[_vc] = dst
-      image.evd[_vc] = dist
-      image.evi[_vc] = diff_fn(_pi, pj)
+      ei[vc] = src
+      ej[vc] = dst
+      evd[vc] = dist
+      evi[vc] = diff_fn(_pi, pj)
 
-      _vc += 1
+      vc += 1
     end
     track && next!(p)
   end
 
-  image.vc = _vc - 1
+  # fix vector sizes
+  vc -= 1
+  resize!(ei, vc)
+  resize!(ej, vc)
+  resize!(evd, vc)
+  resize!(evi, vc)
 
-  nothing
+  Image{T}(data, d, ei, ej, evd, evi)
 end
 
 # ********** load image -- multithread **********
@@ -69,17 +81,15 @@ function construct_graph!(
   nothing 
 end
 
-function load_mt!(
-  image::AbstractImage{T},
+function build_mt(
+  data::AbstractArray{T}, d::Int,
   diff_fn::Function,
   track::Bool
 ) where T <: Unsigned
-  data = image.data
-
   nt = Threads.nthreads()
   R = CartesianIndices(data)
   cf, cl = first(R), last(R)
-  dd = image.d * oneunit(cf)
+  dd = d * oneunit(cf)
 
   # make as large blocks as we can along the longest dimension
   sz, dim = findmax(size(data))
@@ -117,12 +127,12 @@ function load_mt!(
     )
   end
 
-  image.ei = cat(eis..., dims=1)
-  image.ej = cat(ejs..., dims=1)
-  image.evd = cat(evds..., dims=1)
-  image.evi = cat(evis..., dims=1)
+  ei = cat(eis..., dims=1)
+  ej = cat(ejs..., dims=1)
+  evd = cat(evds..., dims=1)
+  evi = cat(evis..., dims=1)
 
-  nothing
+  Image{T}(data, d, ei, ej, evd, evi)
 end
 
 # ********** load image -- cuda **********
