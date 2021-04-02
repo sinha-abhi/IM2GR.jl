@@ -13,10 +13,10 @@ using IM2GR
 data= <data source>
 diff_fn = <image diff func>
 d = <search distance>
-image = Image{UInt8}(data, diff_fn, d)
-ei, ej, evd, evi = im2gr!(image, <construction mode>, track=true)
+image = im2gr!(data, d, <construction mode>, diff_fn, track=true)
+@show image.ei, image.ej, image.evd, image.evi
 ```
-The result vectors are also stored in `image`.
+The result vectors are stored in `image`.
 
 ## C++
 ### Executable
