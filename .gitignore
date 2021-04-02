@@ -1,6 +1,7 @@
 # ***** C++ files (for now) *****
 cpp/
 Makefile
+README.md.cpp
 
 # real data files
 laendo.*
