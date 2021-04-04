@@ -111,13 +111,13 @@ function mt_init(
   evds = Vector{Vector{Float64}}(undef, nb)
   evis = Vector{Vector{Float64}}(undef, nb)
 
-	# allocate memory for thread-local vectors
-	# https://julialang.org/blog/2019/07/multithreading/#thread-local_state
-	eis = Vector{Vector{Int}}(undef, nb)
-	ejs = Vector{Vector{Int}}(undef, nb)
-	evds = Vector{Vector{Float64}}(undef, nb)
-	evis = Vector{Vector{Float64}}(undef, nb)
-	for b in 1 : nb
+  # allocate memory for thread-local vectors
+  # https://julialang.org/blog/2019/07/multithreading/#thread-local_state
+  eis = Vector{Vector{Int}}(undef, nb)
+  ejs = Vector{Vector{Int}}(undef, nb)
+  evds = Vector{Vector{Float64}}(undef, nb)
+  evis = Vector{Vector{Float64}}(undef, nb)
+  for b in 1 : nb
     start = 1 + bsz * (b-1)
     stop = bsz + bsz * (b-1)
     stop = stop > cl[ax] ? cl[ax] : stop
@@ -141,9 +141,9 @@ function mt_init(
     ejs[b] = Int[]
     evds[b] = Float64[]
     evis[b] = Float64[]
-	end
-	
-	bstarts, bstops, boffsets, dstarts, dstops, eis, ejs, evds, evis
+  end
+  
+  bstarts, bstops, boffsets, dstarts, dstops, eis, ejs, evds, evis
 end
 
 # ********** load image -- cuda **********

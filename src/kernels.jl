@@ -14,15 +14,15 @@ function mt_construct_kernel!(
     src = imap[idx]
     _pi = data[idx]
     for nidx in idx_low : idx_up
-        dst = imap[nidx]
-        (src == dst) && continue
-        dist = norm(Tuple(idx-nidx))^2
-        pj = data[nidx]
+      dst = imap[nidx]
+      (src == dst) && continue
+      dist = norm(Tuple(idx-nidx))^2
+      pj = data[nidx]
 
-        push!(ei, src)
-        push!(ej, dst)
-        push!(evd, dist)
-        push!(evi, diff_fn(_pi, pj))
+      push!(ei, src)
+      push!(ej, dst)
+      push!(evd, dist)
+      push!(evi, diff_fn(_pi, pj))
     end
   end
 
