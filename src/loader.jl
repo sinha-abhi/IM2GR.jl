@@ -60,7 +60,6 @@ function mt_construct(
 )
   nt = Threads.nthreads()
   R = CartesianIndices(data)
-  imap = LinearIndices(R)
   cf, cl = first(R), last(R)
   dd = d * oneunit(cf)
 
@@ -82,7 +81,7 @@ function mt_construct(
         dstarts[b][2]:dstops[b][2], 
         dstarts[b][3]:dstops[b][3]
       ),
-      diff_fn, dd, imap, cf, cl,
+      diff_fn, dd, cf, cl,
       bstarts[b], bstops[b], boffsets[b], 
       dstarts[b], dstops[b]
     )

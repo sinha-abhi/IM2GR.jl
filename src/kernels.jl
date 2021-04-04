@@ -4,10 +4,12 @@ function mt_construct_kernel!(
   ei::Vector{Int}, ej::Vector{Int},
   evd::Vector{Float64}, evi::Vector{Float64},
   data::AbstractArray{<: Unsigned}, diff_fn::Function, dd::CartesianIndex,
-  imap::LinearIndices, cf::CartesianIndex, cl::CartesianIndex,
+  cf::CartesianIndex, cl::CartesianIndex,
   bstart::CartesianIndex, bstop::CartesianIndex, boffset::CartesianIndex,
   dstart::CartesianIndex, dstop::CartesianIndex
 )
+  imap = LinearIndices(data)
+
   for idx in bstart : bstop
     idx_low = max(dstart, idx-dd)
     idx_up = min(dstop, idx+dd)
