@@ -2,6 +2,8 @@ module IM2GR
 
 using FileIO
 using Images
+
+using AxisArrays
 using LinearAlgebra
 using OffsetArrays
 

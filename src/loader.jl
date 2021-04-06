@@ -73,18 +73,33 @@ function mt_construct(
   )
 
   @sync for b in 1 : nb
-    @spawn mt_construct_kernel!(
-      eis[b], ejs[b], evds[b], evis[b],
-      OffsetArray(
-        data[dstarts[b]:dstops[b]], 
-        dstarts[b][1]:dstops[b][1], 
-        dstarts[b][2]:dstops[b][2], 
-        dstarts[b][3]:dstops[b][3]
-      ),
-      diff_fn, dd, cf, cl,
-      bstarts[b], bstops[b], boffsets[b], 
-      dstarts[b], dstops[b]
-    )
+    if data isa AxisArray
+      @spawn mt_construct_kernel!(
+        eis[b], ejs[b], evds[b], evis[b],
+        OffsetArray(
+          data.data[dstarts[b]:dstops[b]],
+          dstarts[b][1]:dstops[b][1],
+          dstarts[b][2]:dstops[b][2],
+          dstarts[b][3]:dstops[b][3]
+        ),
+        diff_fn, dd, cf, cl,
+        bstarts[b], bstops[b], boffsets[b],
+        dstarts[b], dstops[b]
+      )
+    else
+      @spawn mt_construct_kernel!(
+        eis[b], ejs[b], evds[b], evis[b],
+        OffsetArray(
+          data[dstarts[b]:dstops[b]],
+          dstarts[b][1]:dstops[b][1],
+          dstarts[b][2]:dstops[b][2],
+          dstarts[b][3]:dstops[b][3]
+        ),
+        diff_fn, dd, cf, cl,
+        bstarts[b], bstops[b], boffsets[b],
+        dstarts[b], dstops[b]
+      )
+    end
   end
 
   ei = cat(eis..., dims=1)
