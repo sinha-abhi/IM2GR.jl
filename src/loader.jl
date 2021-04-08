@@ -58,13 +58,14 @@ function mt_construct(
   diff_fn::Function,
   track::Bool
 )
+  _data = data isa AxisArray ? data.data : data
   nt = Threads.nthreads()
-  R = CartesianIndices(data)
+  R = CartesianIndices(_data)
   cf, cl = first(R), last(R)
   dd = d * oneunit(cf)
 
   # make as large blocks as we can along the longest dimension
-  sz, ax = findmax(size(data))
+  sz, ax = findmax(size(_data))
   bsz = sz < nt ? 1 : ceil(Int, sz / nt)
   nb = Int(sz / bsz)
 
@@ -73,33 +74,18 @@ function mt_construct(
   )
 
   @sync for b in 1 : nb
-    if data isa AxisArray
-      @spawn mt_construct_kernel!(
-        eis[b], ejs[b], evds[b], evis[b],
-        OffsetArray(
-          data.data[dstarts[b]:dstops[b]],
-          dstarts[b][1]:dstops[b][1],
-          dstarts[b][2]:dstops[b][2],
-          dstarts[b][3]:dstops[b][3]
-        ),
-        diff_fn, dd, cf, cl,
-        bstarts[b], bstops[b], boffsets[b],
-        dstarts[b], dstops[b]
-      )
-    else
-      @spawn mt_construct_kernel!(
-        eis[b], ejs[b], evds[b], evis[b],
-        OffsetArray(
-          data[dstarts[b]:dstops[b]],
-          dstarts[b][1]:dstops[b][1],
-          dstarts[b][2]:dstops[b][2],
-          dstarts[b][3]:dstops[b][3]
-        ),
-        diff_fn, dd, cf, cl,
-        bstarts[b], bstops[b], boffsets[b],
-        dstarts[b], dstops[b]
-      )
-    end
+    @spawn mt_construct_kernel!(
+      eis[b], ejs[b], evds[b], evis[b],
+      OffsetArray(
+        _data[dstarts[b]:dstops[b]],
+        dstarts[b][1]:dstops[b][1],
+        dstarts[b][2]:dstops[b][2],
+        dstarts[b][3]:dstops[b][3]
+      ),
+      diff_fn, dd, cf, cl,
+      bstarts[b], bstops[b], boffsets[b],
+      dstarts[b], dstops[b]
+    )
   end
 
   ei = cat(eis..., dims=1)
