@@ -28,16 +28,16 @@ Try `make list` for all compilation options.
 
 ### API
 ```cpp
-std::string path(<data path>);
+Data *data = new Data(<data path>);
 int d = <d>;
-diff_fn dfn = <image diff function>;
-Loader<short> loader(path, d);
-loader.im2gr(dfn);
+diff_fn diff = <image diff function>;
+Image image = im2gr(data, d, <construction mode>, diff);
 
-Index<short> *ei = loader.get_ei();
-Index<short> *ei = loader.get_ei();
-float *evd = loader.get_evd();
-float *evi = loader.get_evi();
+Index *ei = image.get_ei();
+Index *ei = image.get_ei();
+float *evd = image.get_evd();
+float *evi = image.get_evi();
+size_t vc = image.get_vc();   // length of result vectors
 ```
 Image diff functions must accept two `float` arguments and have a return type
 of `float`.
