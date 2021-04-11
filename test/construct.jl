@@ -12,7 +12,7 @@ ret = [
   [654 109.352641 479834.242936]
 ]
 
-function run_loader_tests(mode::ConstructionMode, data, d, ret)
+function run_construct_tests(mode::ConstructionMode, data, d, ret)
   for t = 1 : length(data)
     image = im2gr!(data[t], d[t], mode)
     @test begin 
@@ -29,11 +29,11 @@ function run_loader_tests(mode::ConstructionMode, data, d, ret)
 end
 
 @testset "single" begin
-  run_loader_tests(IM2GR.SingleThread, data, d, ret)
+  run_construct_tests(IM2GR.SingleThread, data, d, ret)
 end
 
 @testset "multi" begin
-  run_loader_tests(IM2GR.MultiThread, data, d, ret)
+  run_construct_tests(IM2GR.MultiThread, data, d, ret)
 end
 
 @testset "consistency" begin

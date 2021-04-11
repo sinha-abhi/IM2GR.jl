@@ -6,5 +6,5 @@ using Test
 
 @testset verbose=true "IM2GR" begin
   include("bounds.jl")
-  include("loader.jl")
+  include("construct.jl")
 end
