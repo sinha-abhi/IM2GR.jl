@@ -6,10 +6,11 @@ function mt_construct_kernel!(
   data::AbstractArray{<: Unsigned}, diff_fn::Function, dd::CartesianIndex,
   cf::CartesianIndex, cl::CartesianIndex,
   bstart::CartesianIndex, bstop::CartesianIndex, boffset::CartesianIndex,
-  dstart::CartesianIndex, dstop::CartesianIndex
+  dstart::CartesianIndex, dstop::CartesianIndex, vc::Int
 )
   imap = LinearIndices(data)
 
+  vc = 1
   for idx in bstart : bstop
     idx_low = max(dstart, idx-dd)
     idx_up = min(dstop, idx+dd)
@@ -21,12 +22,21 @@ function mt_construct_kernel!(
       dist = norm(Tuple(idx-nidx))^2
       pj = data[nidx]
 
-      push!(ei, src)
-      push!(ej, dst)
-      push!(evd, dist)
-      push!(evi, diff_fn(_pi, pj))
+      ei[vc] = src
+      ej[vc] = dst
+      evd[vc] = dist
+      evi[vc] = diff_fn(_pi, pj)
+
+      vc += 1
     end
   end
+
+  # fix vector sizes
+  vc -= 1
+  resize!(ei, vc)
+  resize!(ej, vc)
+  resize!(evd, vc)
+  resize!(evi, vc)
 
   nothing 
 end

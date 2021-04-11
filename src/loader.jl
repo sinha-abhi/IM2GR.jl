@@ -65,14 +65,15 @@ function mt_construct(
   dd = d * oneunit(cf)
 
   # make as large blocks as we can along the longest dimension
-  sz, ax = findmax(size(_data))
-  bsz = sz < nt ? 1 : ceil(Int, sz / nt)
-  nb = Int(sz / bsz)
+  sz = size(_data)
+  ml, ax = findmax(sz)
+  bl = ml < nt ? 1 : ceil(Int, ml / nt)
+  nb = Int(ml / bl)
 
+  vcs = Vector{Int}(undef, nb)
   bstarts, bstops, boffsets, dstarts, dstops, eis, ejs, evds, evis = mt_init(
-    nb, bsz, ax, dd, cf, cl
+    sz, nb, bl, ax, dd, d, cf, cl
   )
-
   @sync for b in 1 : nb
     @spawn mt_construct_kernel!(
       eis[b], ejs[b], evds[b], evis[b],
@@ -84,7 +85,7 @@ function mt_construct(
       ),
       diff_fn, dd, cf, cl,
       bstarts[b], bstops[b], boffsets[b],
-      dstarts[b], dstops[b]
+      dstarts[b], dstops[b], vcs[b]
     )
   end
 
@@ -97,8 +98,8 @@ function mt_construct(
 end
 
 function mt_init(
-  nb::Int, bsz::Int, ax::Int, 
-  dd::CartesianIndex, cf::CartesianIndex, cl::CartesianIndex
+  sz::Tuple, nb::Int, bl::Int, ax::Int, 
+  dd::CartesianIndex, d::Int, cf::CartesianIndex, cl::CartesianIndex
 )
   bstarts = Vector{CartesianIndex}(undef, nb)
   bstops = Vector{CartesianIndex}(undef, nb)
@@ -106,22 +107,19 @@ function mt_init(
   dstarts = Vector{CartesianIndex}(undef, nb)
   dstops = Vector{CartesianIndex}(undef, nb)
 
-  eis = Vector{Vector{Int}}(undef, nb)
-  ejs = Vector{Vector{Int}}(undef, nb)
-  evds = Vector{Vector{Float64}}(undef, nb)
-  evis = Vector{Vector{Float64}}(undef, nb)
-
   # allocate memory for thread-local vectors
   # https://julialang.org/blog/2019/07/multithreading/#thread-local_state
+  sb = partialbound(sz, bl, ax, d, Side)
+  mb = partialbound(sz, bl, ax, d, Middle)
   eis = Vector{Vector{Int}}(undef, nb)
   ejs = Vector{Vector{Int}}(undef, nb)
   evds = Vector{Vector{Float64}}(undef, nb)
   evis = Vector{Vector{Float64}}(undef, nb)
   for b in 1 : nb
-    start = 1 + bsz * (b-1)
-    stop = bsz + bsz * (b-1)
+    start = 1 + bl * (b-1)
+    stop = bl + bl * (b-1)
     stop = stop > cl[ax] ? cl[ax] : stop
-    offset = bsz * (b-1)
+    offset = bl * (b-1)
     bstart = Vector{Int}(undef, 3)
     bstop = Vector{Int}(undef, 3)
     boffset = Vector{Int}(undef, 3)
@@ -137,10 +135,18 @@ function mt_init(
     dstarts[b] = max(cf, bstarts[b] - dd)
     dstops[b] = min(cl, bstops[b] + dd)
     
-    eis[b] = Int[]
-    ejs[b] = Int[]
-    evds[b] = Float64[]
-    evis[b] = Float64[]
+
+    if b == 1 || b == nb
+      eis[b] = Vector{Int}(undef, sb)
+      ejs[b] = Vector{Int}(undef, sb)
+      evds[b] = Vector{Float64}(undef, sb)
+      evis[b] = Vector{Float64}(undef, sb)
+    else
+      eis[b] = Vector{Int}(undef, mb)
+      ejs[b] = Vector{Int}(undef, mb)
+      evds[b] = Vector{Float64}(undef, mb)
+      evis[b] = Vector{Float64}(undef, mb)
+    end
   end
   
   bstarts, bstops, boffsets, dstarts, dstops, eis, ejs, evds, evis
