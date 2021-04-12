@@ -16,7 +16,7 @@ import Base.Threads.@spawn
 include("types.jl")
 include("bounds.jl")
 include("kernels.jl")
-include("loader.jl")
+include("construct.jl")
 
 include("api.jl")
 
@@ -24,6 +24,6 @@ export
   AbstractImage,
   Image,
   ConstructionMode,
-  im2gr!
+  im2gr
 
 end # module

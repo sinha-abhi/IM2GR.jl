@@ -2,7 +2,6 @@
 #define _UTILS_H_
 
 #include <algorithm>
-#include <cmath>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
@@ -68,27 +67,6 @@ inline void flatten(uint8_t *arr, std::vector<std::vector<uint8_t>> data) {
     flat.insert(flat.end(), v.begin(), v.end());
 
   std::copy(flat.begin(), flat.end(), arr);
-}
-
-inline unsigned long fullbound(size_t *sz, const int d) {
-  unsigned long ub;
-  unsigned long n;
-  size_t x = sz[0];
-  size_t y = sz[1];
-  size_t z = sz[2];
-
-  n = (x-2) * (y-2) * (z-2);
-  ub = n * (pow(2*d+1, 3) - 1);
-
-  n = 2 * ((x-2)*(y-2) + (x-2)*(z-2) + (y-2)*(z-2));
-  ub += n * ((d+1) * pow(2*d+1, 2) - 1);
-
-  n = 4*(x+y) + 4*z - 8;
-  ub += n * ((2*d+1) * pow(d+1, 2) - 1);
-
-  ub += 8 * (pow(d+1, 3) - 1);
-
-  return ub;
 }
 
 #endif /* _UTILS_H_ */

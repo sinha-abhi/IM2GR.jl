@@ -13,7 +13,7 @@ using IM2GR
 data = <data source>
 diff_fn = <image diff func>
 d = <search distance>
-image = im2gr!(data, d, <construction mode>, diff_fn, track=true)
+image = im2gr(data, d, <construction mode>, diff_fn, track=true)
 @show image.ei, image.ej, image.evd, image.evi
 ```
 The result vectors are stored in `image`.
@@ -41,4 +41,24 @@ size_t vc = image.get_vc();   // length of result vectors
 ```
 Image diff functions must accept two `float` arguments and have a return type
 of `float`.
+
+# Testing
+
+## Julia
+Use `]` to enter Pkg REPL, and do:
+```
+pkg> add https://github.com/sinha-abhi/im2gr
+pkg> test
+```
+or, do:
+```julia
+julia> import Pkg; Pkg.add("https://github.com/sinha-abhi/im2gr");
+julia> Pkg.test("IM2GR)
+```
+
+## C++
+```bash
+make test && ./bin/im2gr-test --log_level=test_suite
+```
+C++ tests use the [Boost Unit Test Framework](https://github.com/boostorg/test).
 

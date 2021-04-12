@@ -14,7 +14,7 @@ ret = [
 
 function run_construct_tests(mode::ConstructionMode, data, d, ret)
   for t = 1 : length(data)
-    image = im2gr!(data[t], d[t], mode)
+    image = im2gr(data[t], d[t], mode)
     @test begin 
       length(image.ei) == Int(ret[t, 1]) && 
       length(image.ej) == Int(ret[t, 1])
@@ -38,8 +38,8 @@ end
 
 @testset "consistency" begin
   fake = rand(UInt8, (144, 144, 22))
-  st = im2gr!(fake, 1, IM2GR.SingleThread)
-  mt = im2gr!(fake, 1, IM2GR.MultiThread)
+  st = im2gr(fake, 1, IM2GR.SingleThread)
+  mt = im2gr(fake, 1, IM2GR.MultiThread)
 
   @test length(st.ei) == length(mt.ei) && length(st.ej) == length(mt.ej)
   @test norm(st.evd) ≈ norm(mt.evd) && norm(st.evi) ≈ norm(mt.evi)

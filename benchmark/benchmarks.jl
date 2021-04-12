@@ -15,7 +15,7 @@ mri = load("data/lgemri.nrrd")
 @printf("Image size: %d, %d, %d\n", size(mri)...)
 println(ndims(mri))
 println("Benchmarking... MultiThread")
-@time im2gr!(mri, 1, IM2GR.MultiThread, mri_diff_fn)
+@time im2gr(mri, 1, IM2GR.MultiThread, mri_diff_fn)
 println("Done.")
 =#
 
@@ -23,10 +23,10 @@ sz = (144, 144, 22)
 fake = rand(UInt8, sz)
 @printf("Image size: %d, %d, %d\n", sz...)
 println("Benchmarking... SingleThread")
-@btime im2gr!($fake, 1, IM2GR.SingleThread)
+@btime im2gr($fake, 1, IM2GR.SingleThread)
 println("Done.")
 
 println("Benchmarking... MultiThread")
-@btime im2gr!($fake, 1, IM2GR.MultiThread)
+@btime im2gr($fake, 1, IM2GR.MultiThread)
 println("Done.")
 

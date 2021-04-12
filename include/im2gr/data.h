@@ -8,6 +8,7 @@
 class Data {
 public:
   Data(std::string f);
+  Data(uint8_t ***data, size_t *sz);
   ~Data();
 
   uint8_t ***get_data();

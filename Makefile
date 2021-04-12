@@ -20,8 +20,9 @@ endif
 SRCDIR := src/cxx
 INCDIR := include
 
-TESTSRCDIR := test/cpp/src
-TESTINCDIR := test/cpp/include
+
+TESTSRCDIR := test/cxx
+BOOSTDIR := /usr/include/boost
 
 BMSRCDIR := benchmark/cpp/src
 BMINCDIR := benchmark/cpp/include
@@ -30,24 +31,24 @@ BIN := bin
 
 IM2GRGOALS := im2gr-all im2gr-st im2gr-mt im2gr-cuda
 BMGOALS := benchmark-all benchmark-st benchmark-mt benchmark-cuda
-TESTGOALS := test-all test-st test-mt test-cuda
+TESTGOALS := test
 
 INCPATH = -I$(INCDIR)
-TESTINCPATH = -I$(TESTINCDIR)
 BMINCPATH = -I$(BMINCDIR)
 
 # ----
 CXXFLAGS += $(INCPATH)
 GPUCXXFLAGS += $(INCPATH)
 
-__SRCCPU := $(wildcard $(SRCDIR)/cpu/*.cc)
-__SRCCPU := $(filter-out $(SRCDIR)/cpu/main.cc, $(__SRCCPU))
+__SRCCPU := $(wildcard $(SRCDIR)/*.cc)
+__SRCCPU := $(filter-out $(SRCDIR)/main.cc, $(__SRCCPU))
 
 __SRCGPU := $(wildcard $(SRCDIR)/cuda/*.cu)
 __SRCGPU := $(filter-out $(SRCDIR)/cuda/main.cu, $(__SRCGPU))
 
+
 # ---- all ----
-all: im2gr-all test-all benchmark-all
+all: im2gr-all test benchmark-all
 
 list:
 	@echo "flags:"
@@ -75,19 +76,8 @@ im2gr-cuda: | $(BIN)
 	$(GPUCC) $(GPUCXXFLAGS) -o $(BIN)/$@ $(SRCDIR)/*.cu
 
 # ---- tests -----
-test-all: test-st test-mt test-cuda
-
-test-st: | $(BIN)
-	$(CC) $(CXXFLAGS) $(TESTINCPATH)/cpu -o $(BIN)/im2gr-$@ \
-            $(__SRCCPU) $(TESTSRCDIR)/cpu/*-st.cc
-
-test-mt: | $(BIN)
-	$(CC) $(CXXFLAGS) $(TESTINCPATH)/cpu -DMULTITHREAD -o $(BIN)/im2gr-$@ \
-            $(__SRCCPU) $(TESTSRCDIR)/cpu/*-mt.cc -pthread
-
-test-cuda: | $(BIN)
-	$(GPUCC) $(GPUCXXFLAGS) $(TESTINCPATH)/cuda -o $(BIN)/im2gr-$@ \
-            $(__SRCGPU) $(TESTSRCDIR)/cuda/*.cu
+test: | $(BIN)
+	$(CC) $(CXXFLAGS) -o $(BIN)/im2gr-$@ $(__SRCCPU) $(TESTSRCDIR)/*.cc -lboost_unit_test_framework
 
 # ---- benchmark ----
 benchmark-all: benchmark-st benchmark-mt benchmark-cuda
@@ -106,8 +96,8 @@ benchmark-cuda: | $(BIN)
 
 # ----
 $(BIN):
-	mkdir -p $@
+	@mkdir -p $@
 
 
-.PHONY: all im2gr-all test-all benchmark-all clean list
+.PHONY: all im2gr-all test benchmark-all clean list
 

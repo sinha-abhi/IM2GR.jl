@@ -30,6 +30,15 @@ Data::Data(std::string f) {
 #endif
 }
 
+Data::Data(uint8_t ***data, size_t *sz) : data(data), sz(sz) {
+#if DEBUG
+  std::cout << "Image size: " << sz[0] << ", "
+            << sz[1] << ", "
+            << sz[2] << std::endl;
+#endif
+  // empty
+}
+
 Data::~Data() {
   delete[] sz;
   for (int i = 0; i < MAX_X; ++i) {

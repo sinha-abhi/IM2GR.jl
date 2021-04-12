@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "im2gr/diff-func.h"
 #include "im2gr/im2gr.h"
 
 int main(int argc, char **argv) {

@@ -1,7 +1,7 @@
 # api functions
 
 # probably don't use `track` when benchmarking
-function im2gr!(
+function im2gr(
   data::AbstractArray{ <: Unsigned}, d::Int,
   mode::ConstructionMode,
   diff_fn::Function = __default_diff_fn;

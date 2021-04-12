@@ -13,7 +13,6 @@ struct Image{T} <: AbstractImage{T}
   evi::Vector{Float64}
 end
 
-
 @enum ConstructionMode begin
   SingleThread
   MultiThread

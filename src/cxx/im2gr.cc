@@ -3,16 +3,7 @@
 #include "im2gr/diff-func.h"
 #include "im2gr/index.h"
 #include "im2gr/im2gr.h"
-#include "im2gr/utils.h"
-
-Image im2gr(Data *data, const int d, ConstructionMode mode, diff_fn diff) {
-  if (mode == SingleThread)
-    return st_construct(data, d, diff);
-  else if (mode == MultiThread)
-    return mt_construct(data, d, diff);
-  else
-    exit(EXIT_FAILURE);
-}
+#include "im2gr/bounds.h"
 
 Image st_construct(Data *data, const int d, diff_fn diff) {
 #if DEBUG
@@ -40,7 +31,6 @@ Image st_construct(Data *data, const int d, diff_fn diff) {
   Index idx_low, idx_up;
 
   std::pair<Index, Index> bounds;
-
   int x, y, z;
   int nx, ny, nz;
   size_t vc = 0;
@@ -93,5 +83,14 @@ Image st_construct(Data *data, const int d, diff_fn diff) {
 Image mt_construct(Data *data, const int d, diff_fn diff) {
   // TODO
   return Image(nullptr, nullptr, nullptr, nullptr, 0, 0);
+}
+
+Image im2gr(Data *data, const int d, ConstructionMode mode, diff_fn diff) {
+  if (mode == SingleThread)
+    return st_construct(data, d, diff);
+  else if (mode == MultiThread)
+    return mt_construct(data, d, diff);
+  else
+    exit(EXIT_FAILURE);
 }
 
