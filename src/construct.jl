@@ -84,7 +84,7 @@ function mt_construct(
         dstarts[b][2]:dstops[b][2],
         dstarts[b][3]:dstops[b][3]
       ),
-      diff_fn, dd, cf, cl,
+      diff_fn, dd,
       bstarts[b], bstops[b],
       dstarts[b], dstops[b], vcs[b]
     )

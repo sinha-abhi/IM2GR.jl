@@ -2,7 +2,6 @@
 #define _INDEX_H_
 
 #include <ostream>
-#include <utility>
 
 class Index {
 public:
@@ -18,8 +17,6 @@ public:
   void set_z(int z);
 
   int *asptr() const;
-
-  std::pair<Index, Index> ends(const int d, int mx, int my, int mz);
 
   friend float distance(const Index &idx1, const Index &idx2);
   friend Index max(const Index &idx1, const Index &idx2);

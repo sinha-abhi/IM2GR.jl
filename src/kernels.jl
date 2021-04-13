@@ -4,7 +4,6 @@ function mt_construct_kernel!(
   ei::Vector{Int}, ej::Vector{Int},
   evd::Vector{Float64}, evi::Vector{Float64},
   data::AbstractArray{<: Unsigned}, diff_fn::Function, dd::CartesianIndex,
-  cf::CartesianIndex, cl::CartesianIndex,
   bstart::CartesianIndex, bstop::CartesianIndex,
   dstart::CartesianIndex, dstop::CartesianIndex, vc::Int
 )

@@ -54,7 +54,6 @@ BOOST_AUTO_TEST_CASE( test_small_2_d2 ) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
-/*
 BOOST_AUTO_TEST_SUITE( multithread )
 
 BOOST_AUTO_TEST_CASE( test_small_1 ) {
@@ -94,4 +93,3 @@ BOOST_AUTO_TEST_CASE( test_small_2_d2 ) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-*/

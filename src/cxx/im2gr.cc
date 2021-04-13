@@ -1,6 +1,8 @@
 #include <iostream>
 
 #if MULTITHREAD
+#include <cstring>
+#include <numeric>
 #include <thread>
 #endif
 
@@ -31,6 +33,10 @@ Image st_construct(Data *data, const int d, diff_fn diff) {
   int max_y = sz[1] - 1;
   int max_z = sz[2] - 1;
 
+  Index cf;
+  Index cl(max_x, max_y, max_z);
+  Index dd(d, d, d);
+
   Index src, dest;
   Index idx_low, idx_up;
 
@@ -47,9 +53,8 @@ Image st_construct(Data *data, const int d, diff_fn diff) {
         src.set_y(y);
         src.set_z(z);
 
-        bounds = src.ends(d, max_x, max_y, max_z);
-        idx_low = bounds.first;
-        idx_up = bounds.second;
+        idx_low = max(cf, src-dd);
+        idx_up = min(cl, src+dd);
 
         pi = _data[x][y][z];
         for (nx = idx_low.x(); nx <= idx_up.x(); ++nx) {
@@ -85,6 +90,62 @@ Image st_construct(Data *data, const int d, diff_fn diff) {
 }
 
 #if MULTITHREAD
+void mt_construct_kernel(uint8_t ***&data, Index &dd, 
+    diff_fn &diff, Index *&ei, Index *&ej, float *&evd, float *&evi,
+    Index &bstart, Index &bstop, Index &dstart, Index &dstop, size_t &vc) {
+  int sx = bstart.x();
+  int sy = bstart.y();
+  int sz = bstart.z();
+  int mx = bstop.x();
+  int my = bstop.y();
+  int mz = bstop.z();
+
+  vc = 0;
+  Index src, dest;
+  Index idx_low, idx_up;
+
+  int x, y, z;
+  int nx, ny, nz;
+  uint8_t pi, pj;
+  float dist, dst_sq;
+  for (x = sx; x <= mx; ++x) {
+    for (y = sy; y <= my; ++y) {
+      for (z = sz; z <= mz; ++z) {
+        src.set_x(x);
+        src.set_y(y);
+        src.set_z(z);
+
+        idx_low = max(dstart, src-dd);
+        idx_up = min(dstop, src+dd);
+
+        pi = data[x][y][z];
+        for (nx = idx_low.x(); nx <= idx_up.x(); ++nx) {
+          for (ny = idx_low.y(); ny <= idx_up.y(); ++ny) {
+            for (nz = idx_low.z(); nz <= idx_up.z(); ++nz) {
+              dest.set_x(nx);
+              dest.set_y(ny);
+              dest.set_z(nz);
+              if (src == dest)
+                continue;
+
+              dist = distance(src, dest);
+              dst_sq = dist * dist;
+              pj = data[nx][ny][nz];
+
+              ei[vc] = src;
+              ej[vc] = dest;
+              evd[vc] = dst_sq;
+              evi[vc] = diff(pi, pj);
+
+              vc++;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 Image mt_construct(Data *data, const int d, diff_fn diff) {
 #if DEBUG
   std::cout << "Constructing image... MultiThread" << std::endl;
@@ -103,9 +164,13 @@ Image mt_construct(Data *data, const int d, diff_fn diff) {
 #endif
   size_t ml = 0;
   short ax;
-  for (ax = 0; ax < 3; ++ax)
-    if (sz[ax] > ml)
-      ml = sz[ax];
+  for (short a = 0; a < 3; ++a) {
+    if (sz[a] > ml) {
+      ml = sz[a];
+      ax = a;
+    }
+  }
+
   size_t bl = ml < nt ? ml : (size_t) ceil(ml / nt);
   int nb = (int) ceil(ml / bl);
 
@@ -116,8 +181,8 @@ Image mt_construct(Data *data, const int d, diff_fn diff) {
   Index *dstarts = new Index[nb];
   Index *dstops = new Index[nb];
 
-  int **eis = new int*[nb];
-  int **ejs = new int*[nb];
+  Index **eis = new Index*[nb];
+  Index **ejs = new Index*[nb];
   float **evds = new float*[nb];
   float **evis = new float*[nb];
 
@@ -133,7 +198,7 @@ Image mt_construct(Data *data, const int d, diff_fn diff) {
     stop = start + bl;
     stop = stop > sz[ax]-1 ? sz[ax]-1 : stop;
     for (_ax = 0; _ax < 3; _ax++) {
-      bstart[_ax] = (_ax == ax) ? start : 1;
+      bstart[_ax] = (_ax == ax) ? start : 0;
       bstop[_ax] = (_ax == ax) ? stop : sz[_ax]-1;
     }
 
@@ -143,21 +208,65 @@ Image mt_construct(Data *data, const int d, diff_fn diff) {
     dstops[b] = min(cl, bstops[b] + dd);
 
     if ((b == 0) || (b == nb-1)) {
-      eis[b] = new int[sb];
-      ejs[b] = new int[sb];
+      eis[b] = new Index[sb];
+      ejs[b] = new Index[sb];
       evds[b] = new float[sb];
       evis[b] = new float[sb];
     } else {
-      eis[b] = new int[mb];
-      ejs[b] = new int[mb];
+      eis[b] = new Index[mb];
+      ejs[b] = new Index[mb];
       evds[b] = new float[mb];
       evis[b] = new float[mb];
     }
   }
 
-  // TODO: spawn threads, combine results
+  std::vector<std::thread> pool(nb);
+  for (int b = 0; b < nb; ++b) {
+    pool[b] = std::thread(mt_construct_kernel, std::ref(_data), 
+        std::ref(dd), std::ref(diff),
+        std::ref(eis[b]), std::ref(ejs[b]), std::ref(evds[b]), std::ref(evis[b]),
+        std::ref(bstarts[b]), std::ref(bstops[b]), 
+        std::ref(dstarts[b]), std::ref(dstops[b]), std::ref(vcs[b]));
+  }
 
-  return Image(nullptr, nullptr, nullptr, nullptr, 0, 0);
+  for (auto &t : pool)
+    t.join();
+
+  // combine results with memcpy
+  size_t _vc = 0;
+  auto vc = std::accumulate(vcs, vcs+nb, 0);
+  Index *ei = new Index[vc];
+  Index *ej = new Index[vc];
+  float *evd = new float[vc];
+  float *evi = new float[vc];
+  for (int b = 0; b < nb; ++b) {
+    memcpy(ei+_vc, eis[b], vcs[b]*sizeof(Index));
+    memcpy(ej+_vc, eis[b], vcs[b]*sizeof(Index));
+    memcpy(evd+_vc, eis[b], vcs[b]*sizeof(float));
+    memcpy(evi+_vc, eis[b], vcs[b]*sizeof(float));
+    _vc += vcs[b];
+  }
+
+  // free memory
+  for (int b = 0; b < nb; b++) {
+    delete[] eis[b];
+    delete[] ejs[b];
+    delete[] evds[b];
+    delete[] evis[b];
+  }
+
+  delete[] eis;
+  delete[] ejs;
+  delete[] evds;
+  delete[] evis;
+
+  delete[] bstarts;
+  delete[] bstops;
+  delete[] dstarts;
+  delete[] dstops;
+  delete[] vcs;
+
+  return Image(ei, ej, evd, evi, vc, d);
 }
 #endif
 
@@ -165,9 +274,8 @@ Image im2gr(Data *data, const int d, ConstructionMode mode, diff_fn diff) {
   if (mode == SingleThread)
     return st_construct(data, d, diff);
 #if MULTITHREAD
-  if (mode == MultiThread) {
+  if (mode == MultiThread)
     return mt_construct(data, d, diff);
-  }
 #else
   if (mode == MultiThread) {
     std::cerr << "im2gr must be compiled with MULTITHREAD enabled." << std::endl;

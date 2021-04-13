@@ -45,50 +45,6 @@ int *Index::asptr() const {
   return ret;
 }
 
-std::pair<Index, Index> Index::ends(const int d, 
-                                    int mx, int my, int mz) {
-  Index low, up;
-  int lx = _x - d;
-  int ly = _y - d;
-  int lz = _z - d;
-
-  int ux = _x + d;
-  int uy = _y + d;
-  int uz = _z + d;
-
-  if (lx < 0)
-    low.set_x(0);
-  else
-    low.set_x(lx);
-
-  if (ly < 0)
-    low.set_y(0);
-  else
-    low.set_y(ly);
-
-  if (lz < 0)
-    low.set_z(0);
-  else
-    low.set_z(lz);
-
-  if (ux > mx)
-    up.set_x(mx);
-  else
-    up.set_x(ux);
-
-  if (uy > my)
-    up.set_y(my);
-  else
-    up.set_y(uy);
-
-  if (uz > mz)
-    up.set_z(mz);
-  else
-    up.set_z(uz);
-
-  return std::make_pair(low, up);
-}
-
 float distance(const Index &idx1, const Index &idx2) {
   float dp = (float) (
     pow(idx1._x-idx2._x, 2) + 
@@ -108,9 +64,9 @@ Index max(const Index &idx1, const Index &idx2) {
 
   auto ret = Index(m);
 
-  delete m;
-  delete one;
-  delete two;
+  delete[] m;
+  delete[] one;
+  delete[] two;
 
   return ret;
 }
@@ -125,16 +81,16 @@ Index min(const Index &idx1, const Index &idx2) {
 
   auto ret = Index(m);
 
-  delete m;
-  delete one;
-  delete two;
+  delete[] m;
+  delete[] one;
+  delete[] two;
 
   return ret;
 }
 
 Index operator+(const Index &idx1, const Index &idx2) {
   Index ret;
-  ret._y = idx1._x + idx2._x;
+  ret._x = idx1._x + idx2._x;
   ret._y = idx1._y + idx2._y;
   ret._z = idx1._z + idx2._z;
   return ret;
@@ -142,7 +98,7 @@ Index operator+(const Index &idx1, const Index &idx2) {
 
 Index operator-(const Index &idx1, const Index &idx2) {
   Index ret;
-  ret._y = idx1._x - idx2._x;
+  ret._x = idx1._x - idx2._x;
   ret._y = idx1._y - idx2._y;
   ret._z = idx1._z - idx2._z;
   return ret;

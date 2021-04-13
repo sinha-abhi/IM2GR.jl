@@ -70,14 +70,15 @@ im2gr-st: | $(BIN)
 	$(CC) $(CXXFLAGS) -o $(BIN)/$@ $(SRCDIR)/*.cc
 
 im2gr-mt: | $(BIN)
-	$(CC) $(CXXFLAGS) -DMULTITHREAD -o $(BIN)/$@ $(SRCDIR)/*.cc
+	$(CC) $(CXXFLAGS) -DMULTITHREAD -o $(BIN)/$@ $(SRCDIR)/*.cc -pthread
 
 im2gr-cuda: | $(BIN)
 	$(GPUCC) $(GPUCXXFLAGS) -o $(BIN)/$@ $(SRCDIR)/*.cu
 
 # ---- tests -----
 test: | $(BIN)
-	$(CC) $(CXXFLAGS) -o $(BIN)/im2gr-$@ $(__SRCCPU) $(TESTSRCDIR)/*.cc -lboost_unit_test_framework
+	$(CC) $(CXXFLAGS) -DMULTITHREAD -o $(BIN)/im2gr-$@ $(__SRCCPU) $(TESTSRCDIR)/*.cc \
+            -lboost_unit_test_framework -pthread
 
 # ---- benchmark ----
 benchmark-all: benchmark-st benchmark-mt benchmark-cuda
