@@ -162,27 +162,19 @@ Image mt_construct(Data *data, const int d, diff_fn diff) {
 #endif
 
 Image im2gr(Data *data, const int d, ConstructionMode mode, diff_fn diff) {
-#if MULTITHREAD
-  if (mode == SingleThread) {
+  if (mode == SingleThread)
     return st_construct(data, d, diff);
-  } else if (mode == MultiThread) {
+#if MULTITHREAD
+  if (mode == MultiThread) {
     return mt_construct(data, d, diff);
-  } else {
-    std::cerr << "Unsupported construction mode." << std::endl;
-    goto err;
   }
 #else
-  if (mode == SingleThread) {
-    return st_construct(data, d, diff);
-  } else if (mode == MultiThread) {
-    std::cerr << "im2gr was not compiled with the MULTITHREAD flag enabled."
-              << std::endl;
-    goto err;
-  } else {
-    std::cerr << "Unsupported construction mode." << std::endl;
+  if (mode == MultiThread) {
+    std::cerr << "im2gr must be compiled with MULTITHREAD enabled." << std::endl;
     goto err;
   }
 #endif
+  std::cerr << "Unsupported construction mode." << std::endl;
 err:
   std::cerr << "im2gr errored while trying to construct graph" << std::endl;
   exit(EXIT_FAILURE);
