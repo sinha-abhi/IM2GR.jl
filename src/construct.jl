@@ -67,11 +67,12 @@ function mt_construct(
   # make as large blocks as we can along the longest dimension
   sz = size(_data)
   ml, ax = findmax(sz)
-  bl = ml < nt ? 1 : ceil(Int, ml / nt)
-  nb = Int(ml / bl)
+  bl = ml < nt ? ml : ceil(Int, ml / nt)
+  nb = ceil(Int, ml / bl)
+  # nb = Int(ml / bl)
 
   vcs = Vector{Int}(undef, nb)
-  bstarts, bstops, boffsets, dstarts, dstops, eis, ejs, evds, evis = mt_init(
+  bstarts, bstops, dstarts, dstops, eis, ejs, evds, evis = mt_init(
     sz, nb, bl, ax, dd, d, cf, cl
   )
   @sync for b in 1 : nb
@@ -84,7 +85,7 @@ function mt_construct(
         dstarts[b][3]:dstops[b][3]
       ),
       diff_fn, dd, cf, cl,
-      bstarts[b], bstops[b], boffsets[b],
+      bstarts[b], bstops[b],
       dstarts[b], dstops[b], vcs[b]
     )
   end
@@ -103,7 +104,6 @@ function mt_init(
 )
   bstarts = Vector{CartesianIndex}(undef, nb)
   bstops = Vector{CartesianIndex}(undef, nb)
-  boffsets = Vector{CartesianIndex}(undef, nb)
   dstarts = Vector{CartesianIndex}(undef, nb)
   dstops = Vector{CartesianIndex}(undef, nb)
 
@@ -119,19 +119,15 @@ function mt_init(
     start = 1 + bl * (b-1)
     stop = bl + bl * (b-1)
     stop = stop > cl[ax] ? cl[ax] : stop
-    offset = bl * (b-1)
     bstart = Vector{Int}(undef, 3)
     bstop = Vector{Int}(undef, 3)
-    boffset = Vector{Int}(undef, 3)
     for a in 1 : 3
       bstart[a] = ax == a ? start : 1
       bstop[a] = ax == a ? stop : cl[a]
-      boffset[a] = ax == a ? offset : 0
     end
     
     bstarts[b] = CartesianIndex(bstart...)
     bstops[b] = CartesianIndex(bstop...)
-    boffsets[b] = CartesianIndex(boffset...)
     dstarts[b] = max(cf, bstarts[b] - dd)
     dstops[b] = min(cl, bstops[b] + dd)
     
@@ -149,7 +145,7 @@ function mt_init(
     end
   end
   
-  bstarts, bstops, boffsets, dstarts, dstops, eis, ejs, evds, evis
+  bstarts, bstops, dstarts, dstops, eis, ejs, evds, evis
 end
 
 # ********** load image -- cuda **********

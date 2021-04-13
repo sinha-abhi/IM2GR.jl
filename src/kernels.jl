@@ -5,7 +5,7 @@ function mt_construct_kernel!(
   evd::Vector{Float64}, evi::Vector{Float64},
   data::AbstractArray{<: Unsigned}, diff_fn::Function, dd::CartesianIndex,
   cf::CartesianIndex, cl::CartesianIndex,
-  bstart::CartesianIndex, bstop::CartesianIndex, boffset::CartesianIndex,
+  bstart::CartesianIndex, bstop::CartesianIndex,
   dstart::CartesianIndex, dstop::CartesianIndex, vc::Int
 )
   imap = LinearIndices(data)

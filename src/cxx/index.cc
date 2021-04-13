@@ -6,6 +6,12 @@ Index::Index(int x, int y, int z) : _x(x), _y(y), _z(z) {
   // empty
 }
 
+Index::Index(int *idx) {
+  _x = idx[0];
+  _y = idx[1];
+  _z = idx[2];
+}
+
 int Index::x() {
   return _x;
 }
@@ -30,7 +36,17 @@ void Index::set_z(int z) {
   _z = z;
 }
 
-std::pair<Index, Index> Index::ends(const int d, int mx, int my, int mz) {
+int *Index::asptr() const {
+  int *ret = new int[3];
+  ret[0] = _x;
+  ret[1] = _y;
+  ret[2] = _z;
+
+  return ret;
+}
+
+std::pair<Index, Index> Index::ends(const int d, 
+                                    int mx, int my, int mz) {
   Index low, up;
   int lx = _x - d;
   int ly = _y - d;
@@ -73,20 +89,71 @@ std::pair<Index, Index> Index::ends(const int d, int mx, int my, int mz) {
   return std::make_pair(low, up);
 }
 
-float distance(const Index &i1, const Index &i2) {
+float distance(const Index &idx1, const Index &idx2) {
   float dp = (float) (
-    pow(i1._x-i2._x, 2) + 
-    pow(i1._y-i2._y, 2) + 
-    pow(i1._z-i2._z, 2)
+    pow(idx1._x-idx2._x, 2) + 
+    pow(idx1._y-idx2._y, 2) + 
+    pow(idx1._z-idx2._z, 2)
   );
   return (float) sqrt(dp);
 }
 
-bool operator==(const Index &i1, const Index &i2) {
-  return ((i1._x == i2._x) && (i1._y == i2._y) && (i1._z == i2._z));
+Index max(const Index &idx1, const Index &idx2) {
+  int *m = new int[3];
+  int *one = idx1.asptr();
+  int *two = idx2.asptr();
+
+  for (short i = 0; i < 3; i++)
+    m[i] = one[i] > two[i] ? one[i] : two[i];
+
+  auto ret = Index(m);
+
+  delete m;
+  delete one;
+  delete two;
+
+  return ret;
+}
+
+Index min(const Index &idx1, const Index &idx2) {
+  int *m = new int[3];
+  int *one = idx1.asptr();
+  int *two = idx2.asptr();
+
+  for (short i = 0; i < 3; i++)
+    m[i] = one[i] < two[i] ? one[i] : two[i];
+
+  auto ret = Index(m);
+
+  delete m;
+  delete one;
+  delete two;
+
+  return ret;
+}
+
+Index operator+(const Index &idx1, const Index &idx2) {
+  Index ret;
+  ret._y = idx1._x + idx2._x;
+  ret._y = idx1._y + idx2._y;
+  ret._z = idx1._z + idx2._z;
+  return ret;
+}
+
+Index operator-(const Index &idx1, const Index &idx2) {
+  Index ret;
+  ret._y = idx1._x - idx2._x;
+  ret._y = idx1._y - idx2._y;
+  ret._z = idx1._z - idx2._z;
+  return ret;
+}
+
+bool operator==(const Index &idx1, const Index &idx2) {
+  return ((idx1._x == idx2._x) && (idx1._y == idx2._y) && (idx1._z == idx2._z));
 }
 
 std::ostream &operator<<(std::ostream &o, const Index &idx) {
   o << "[" << idx._x << " " << idx._y << " " << idx._z << "]";
   return o;
 }
+

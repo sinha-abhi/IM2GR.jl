@@ -42,7 +42,7 @@ inline unsigned long planebound(size_t *psz, int d) {
   return ub;
 }
 
-inline unsigned long middlebound(size_t *sz, int bl, int ax, int d) {
+inline unsigned long middlebound(size_t *sz, size_t bl, int ax, int d) {
   size_t *bsz = new size_t[3];
   std::copy(sz, sz + 3, bsz);
   bsz[ax] = bl;
@@ -64,7 +64,7 @@ inline unsigned long middlebound(size_t *sz, int bl, int ax, int d) {
   return (fb + 2*pb);
 }
 
-inline unsigned long sidebound(size_t *sz, int bl, int ax, int d) {
+inline unsigned long sidebound(size_t *sz, size_t bl, int ax, int d) {
   size_t *bsz = new size_t[3];
   std::copy(sz, sz + 3, bsz);
   bsz[ax] = bl;

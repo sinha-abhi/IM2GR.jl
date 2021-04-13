@@ -70,3 +70,4 @@ inline void flatten(uint8_t *arr, std::vector<std::vector<uint8_t>> data) {
 }
 
 #endif /* _UTILS_H_ */
+

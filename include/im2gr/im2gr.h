@@ -14,6 +14,9 @@ using diff_fn = float (*)(float, float);
 Image im2gr(Data *data, const int d, ConstructionMode mode, diff_fn diff);
 
 Image st_construct(Data *data, const int d, diff_fn diff);
+
+#if MULTITRHEAD
 Image mt_construct(Data *data, const int d, diff_fn diff);
+#endif
 
 #endif /* _IM2GR_H_ */
