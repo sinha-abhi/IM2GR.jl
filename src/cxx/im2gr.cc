@@ -156,7 +156,7 @@ Image mt_construct(Data *data, const int d, diff_fn diff) {
   Index cf;
   Index cl(sz[0]-1, sz[1]-1, sz[2]-1);
   Index dd(d, d, d);
-  // find block size
+
   auto nt = std::thread::hardware_concurrency();
   nt = (nt == 0) ? 2 : nt;
 #if DEBUG
@@ -174,7 +174,6 @@ Image mt_construct(Data *data, const int d, diff_fn diff) {
   size_t bl = ml < nt ? ml : (size_t) ceil(ml / nt);
   int nb = (int) ceil(ml / bl);
 
-  // allocate memory for thread local states
   size_t *vcs = new size_t[nb];
   Index *bstarts = new Index[nb];
   Index *bstops = new Index[nb];
@@ -232,22 +231,21 @@ Image mt_construct(Data *data, const int d, diff_fn diff) {
   for (auto &t : pool)
     t.join();
 
-  // combine results with memcpy
-  size_t _vc = 0;
+  size_t _v, v = 0;
   auto vc = std::accumulate(vcs, vcs+nb, 0);
   Index *ei = new Index[vc];
   Index *ej = new Index[vc];
   float *evd = new float[vc];
   float *evi = new float[vc];
   for (int b = 0; b < nb; ++b) {
-    memcpy(ei+_vc, eis[b], vcs[b]*sizeof(Index));
-    memcpy(ej+_vc, eis[b], vcs[b]*sizeof(Index));
-    memcpy(evd+_vc, eis[b], vcs[b]*sizeof(float));
-    memcpy(evi+_vc, eis[b], vcs[b]*sizeof(float));
-    _vc += vcs[b];
+    _v = vcs[b];
+    std::copy(eis[b], eis[b]+_v, ei+v);
+    std::copy(ejs[b], ejs[b]+_v, ej+v);
+    std::copy(evds[b], evds[b]+_v, evd+v);
+    std::copy(evis[b], evis[b]+_v, evi+v);
+    v += _v;
   }
 
-  // free memory
   for (int b = 0; b < nb; b++) {
     delete[] eis[b];
     delete[] ejs[b];

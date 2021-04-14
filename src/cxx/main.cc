@@ -19,11 +19,6 @@ int main(int argc, char **argv) {
   auto image = im2gr(data, d, SingleThread, mri_diff_func);
 #endif
 
-  auto vc = image.get_vc();
-  float *evi = image.get_evi();
-  for (int i = 0; i < vc; i++)
-    std::cout << evi[i] << std::endl;
-
   delete data;
 
   return 0;
