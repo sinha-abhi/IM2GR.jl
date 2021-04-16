@@ -11,6 +11,8 @@ using NRRD
 using Printf
 using ProgressMeter
 
+using CUDA
+
 import Base.Threads.@spawn
 
 include("types.jl")

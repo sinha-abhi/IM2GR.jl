@@ -1,6 +1,5 @@
 # api functions
 
-# probably don't use `track` when benchmarking
 function im2gr(
   data::AbstractArray{ <: Unsigned}, d::Int,
   mode::ConstructionMode,
@@ -21,7 +20,10 @@ function im2gr(
 
   (mode == SingleThread) && return st_construct(data, d, diff_fn, track)
   (mode == MultiThread) && return mt_construct(data, d, diff_fn, track)
-  (mode == CUDA) && return cuda_construct(data, d, diff_fn, track)
+  if mode == CUDA
+    @assert CUDA.functional(true)
+    return cuda_construct(data, d, diff_fn, track)
+  end
 
   nothing
 end
