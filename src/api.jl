@@ -18,12 +18,9 @@ function im2gr(
     @printf("Constructing graph... %s\n", mode)
   end
 
-  (mode == SingleThread) && return st_construct(data, d, diff_fn, track)
-  (mode == MultiThread) && return mt_construct(data, d, diff_fn, track)
-  if mode == CUDA
-    @assert CUDA.functional(true)
-    return cuda_construct(data, d, diff_fn, track)
-  end
+  mode == CM_SingleThread && return st_construct(data, d, diff_fn, track)
+  mode == CM_MultiThread && return mt_construct(data, d, diff_fn, track)
+  mode == CM_CUDA && gpu_avail[] && return cuda_construct(data, d, diff_fn, track)
 
   nothing
 end

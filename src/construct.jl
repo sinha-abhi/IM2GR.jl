@@ -16,21 +16,21 @@ function st_construct(
   ub = fullbound(size(data), d)
   ei = Vector{Int}(undef, ub)
   ej = Vector{Int}(undef, ub)
-  evd = Vector{Float64}(undef, ub)
-  evi = Vector{Float64}(undef, ub)
+  evd = Vector{Float32}(undef, ub)
+  evi = Vector{Float32}(undef, ub)
 
   track && (p = Progress(length(R)))
   vc = 1
-  for idx in R
-    idx_lower = max(cf, idx-dd)
-    idx_upper = min(cl, idx+dd)
-    src = imap[idx]
-    _pi = data[idx]
-    for nidx in idx_lower : idx_upper
-      dst = imap[nidx]
+  for I in R
+    lower = max(cf, I-dd)
+    upper = min(cl, I+dd)
+    src = imap[I]
+    _pi = data[I]
+    for J in lower : upper
+      dst = imap[J]
       (src == dst) && continue
-      dist = norm(Tuple(idx - nidx))^2
-      pj = data[nidx]
+      dist = norm(Tuple(I - J))^2
+      pj = data[J]
 
       ei[vc] = src
       ej[vc] = dst
@@ -49,7 +49,7 @@ function st_construct(
   resize!(evd, vc)
   resize!(evi, vc)
 
-  Image{eltype(data)}(d, ei, ej, evd, evi)
+  Image(d, ei, ej, evd, evi)
 end
 
 # ********** load image -- multithread **********
@@ -95,7 +95,7 @@ function mt_construct(
   evd = cat(evds..., dims=1)
   evi = cat(evis..., dims=1)
 
-  Image{eltype(data)}(d, ei, ej, evd, evi)
+  Image(d, ei, ej, evd, evi)
 end
 
 function mt_init(
@@ -108,13 +108,12 @@ function mt_init(
   dstops = Vector{CartesianIndex}(undef, nb)
 
   # allocate memory for thread-local vectors
-  # https://julialang.org/blog/2019/07/multithreading/#thread-local_state
   sb = partialbound(sz, bl, ax, d, Side)
   mb = partialbound(sz, bl, ax, d, Middle)
   eis = Vector{Vector{Int}}(undef, nb)
   ejs = Vector{Vector{Int}}(undef, nb)
-  evds = Vector{Vector{Float64}}(undef, nb)
-  evis = Vector{Vector{Float64}}(undef, nb)
+  evds = Vector{Vector{Float32}}(undef, nb)
+  evis = Vector{Vector{Float32}}(undef, nb)
   for b in 1 : nb
     start = 1 + bl * (b-1)
     stop = bl + bl * (b-1)
@@ -135,13 +134,13 @@ function mt_init(
     if b == 1 || b == nb
       eis[b] = Vector{Int}(undef, sb)
       ejs[b] = Vector{Int}(undef, sb)
-      evds[b] = Vector{Float64}(undef, sb)
-      evis[b] = Vector{Float64}(undef, sb)
+      evds[b] = Vector{Float32}(undef, sb)
+      evis[b] = Vector{Float32}(undef, sb)
     else
       eis[b] = Vector{Int}(undef, mb)
       ejs[b] = Vector{Int}(undef, mb)
-      evds[b] = Vector{Float64}(undef, mb)
-      evis[b] = Vector{Float64}(undef, mb)
+      evds[b] = Vector{Float32}(undef, mb)
+      evis[b] = Vector{Float32}(undef, mb)
     end
   end
   
@@ -154,6 +153,25 @@ function cuda_construct(
   diff_fn::Function,
   track::Bool
 )
-  nothing
-end
+  data_d = CuArray(data)
+  R = CartesianIndices(data)
+  imap = LinearIndices(R)
+  cf, cl = first(R), last(R)
+  sz = size(data)
 
+  _one = oneunit(cf)
+  dd = d * _one
+  bm = 3d * _one
+  jmap = LinearIndices(dd:bm)
+
+  n = length(imap)
+  V_d = CuArray(fill(NaN32, (2d+1)^ndims(data), n))
+
+  threads = (8, 8, 8)
+  blocks = cld.(sz, threads)
+  @cuda blocks=blocks threads=threads cuda_construct_kernel!(
+    V_d, data_d, R, cf, cl, dd, imap, jmap, diff_fn, _one
+  )
+
+  ImageCUDA(d, Array(V_d))
+end

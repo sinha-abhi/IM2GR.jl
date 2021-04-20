@@ -1,22 +1,29 @@
 # types for im2gr
 
 # ********** images **********
-abstract type AbstractImage{T <: Unsigned} end
+abstract type AbstractImage end
 
-struct Image{T} <: AbstractImage{T}
+struct Image <: AbstractImage
   d::Int
 
   # result vectors
   ei::Vector{Int}
   ej::Vector{Int}
-  evd::Vector{Float64}
-  evi::Vector{Float64}
+  evd::Vector{Float32}
+  evi::Vector{Float32}
+end
+
+struct ImageCUDA <: AbstractImage
+  d::Int
+
+  # weighted adjacency matrix
+  V::AbstractArray{Float32}
 end
 
 @enum ConstructionMode begin
-  SingleThread
-  MultiThread
-  CUDA
+  CM_SingleThread
+  CM_MultiThread
+  CM_CUDA
 end
 
 @enum Sections begin
