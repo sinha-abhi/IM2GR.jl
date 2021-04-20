@@ -42,9 +42,9 @@ end
 
 function cuda_construct_kernel!(V, data, R, cf, cl, dd, imap, jmap, diff_fn, _one)
   I = CartesianIndex(
-    (blockIdx().z-1) * blockDim().z + threadIdx().z,
+    (blockIdx().x-1) * blockDim().x + threadIdx().x,
     (blockIdx().y-1) * blockDim().y + threadIdx().y,
-    (blockIdx().x-1) * blockDim().x + threadIdx().x
+    (blockIdx().z-1) * blockDim().z + threadIdx().z
   )
 
   if I in R
