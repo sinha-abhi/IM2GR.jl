@@ -37,11 +37,15 @@ end
 end
 
 @testset "cuda" begin
-  for t = 1 : length(data)
-    image = im2gr(data[t], d[t], IM2GR.CM_CUDA)
-    @test begin
-      isapprox(norm(filter(!isnan, image.V)), ret[t, 3], atol=0.2)
+  if CUDA.functional()
+    for t = 1 : length(data)
+      image = im2gr(data[t], d[t], IM2GR.CM_CUDA)
+      @test begin
+        isapprox(norm(filter(!isnan, image.V)), ret[t, 3], atol=0.2)
+      end
     end
+  else
+    @warn("CUDA not available... ignoring CUDA tests")
   end
 
   nothing
