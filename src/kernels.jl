@@ -10,7 +10,7 @@ function mt_construct_kernel!(
   imap = LinearIndices(data)
 
   vc = 1
-  for idx in bstart : bstop
+  @inbounds for idx in bstart : bstop
     idx_low = max(dstart, idx-dd)
     idx_up = min(dstop, idx+dd)
     src = imap[idx]
@@ -48,16 +48,18 @@ function cuda_construct_kernel!(V, data, R, cf, cl, dd, imap, jmap, diff_fn, _on
   )
 
   if I in R
-    lower = Base.max(cf, I-dd)
-    upper = Base.min(cl, I+dd)
-    _pi = data[I]
-    src = imap[I]
-    for J in lower : upper
-      dst = imap[J]
-      src == dst && continue
-      pj = data[J]
-      noffset = jmap[J-lower+_one]
-      V[noffset, src] = diff_fn(_pi, pj)
+    @inbounds begin 
+      lower = Base.max(cf, I-dd)
+      upper = Base.min(cl, I+dd)
+      _pi = data[I]
+      src = imap[I]
+      for J in lower : upper
+        dst = imap[J]
+        src == dst && continue
+        pj = data[J]
+        noffset = jmap[J-lower+_one]
+        V[noffset, src] = diff_fn(_pi, pj)
+      end
     end
   end
 

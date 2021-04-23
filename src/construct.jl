@@ -21,7 +21,7 @@ function st_construct(
 
   track && (p = Progress(length(R)))
   vc = 1
-  for I in R
+  @inbounds for I in R
     lower = max(cf, I-dd)
     upper = min(cl, I+dd)
     src = imap[I]
