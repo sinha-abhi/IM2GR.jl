@@ -1,3 +1,8 @@
+using Pkg
+if isfile("Project.toml") && isfile("Manifest.toml")
+  Pkg.activate(".")
+end
+
 using BenchmarkTools
 
 using FileIO
@@ -52,14 +57,17 @@ mri = load("data/lgemri.nrrd")
 
 fake = rand(UInt8, (144, 144, 22))
 
-bm_singlethread(mri, 1, "benchmark/st-mri-unimodular-1.txt", mri_diff_fn)
-bm_singlethread(fake, 1, "benchmark/st-fake-unimodular-1.txt")
-bm_singlethread(mri, 2, "benchmark/st-mri-unimodular-2.txt", mri_diff_fn)
-bm_singlethread(fake, 2, "benchmark/st-fake-unimodular-2.txt")
+#bm_singlethread(mri, 1, "benchmark/st-mri-unimodular-1.txt", mri_diff_fn)
+#bm_singlethread(fake, 1, "benchmark/st-fake-unimodular-1.txt")
+#bm_singlethread(mri, 2, "benchmark/st-mri-unimodular-2.txt", mri_diff_fn)
+#bm_singlethread(fake, 2, "benchmark/st-fake-unimodular-2.txt")
 
-#bm_multithread(mri, 1, "benchmark/mt-mri-unimodular.txt", mri_diff_fn)
-#bm_multithread(fake, 1, "benchmark/mt-fake-unimodular.txt")
+#bm_multithread(mri, 1, "benchmark/384/mt-mri-unimodular-1.txt", mri_diff_fn)
+#bm_multithread(mri, 2, "benchmark/384/mt-mri-unimodular-2.txt", mri_diff_fn)
+#bm_multithread(fake, 1, "benchmark/384/mt-fake-unimodular-1.txt")
+#bm_multithread(fake, 2, "benchmark/384/mt-fake-unimodular-2.txt")
 
 #bm_cuda(mri, 1, "benchmark/cuda-mri-unimodular.txt", mri_diff_fn)
-#bm_cuda(fake, 1, "benchmark/cuda-fake-unimodular.txt")
+bm_cuda(fake, 1, "benchmark/cuda-fake-unimodular-1.txt")
+#bm_cuda(fake, 2, "benchmark/cuda-fake-unimodular-2.txt")
 
