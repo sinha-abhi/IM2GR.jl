@@ -2,7 +2,7 @@ Image Graphs
 ============
 
 An exploration of algorithms for constructing graphs derived from image-like
-data in parallel. See our [research statment](docs/rs/research-statement.pdf).
+data in parallel. See our [final report](docs/im2gr.pdf).
 
 # Examples
 
