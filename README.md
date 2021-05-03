@@ -1,12 +1,10 @@
-Image Graphs
-============
+IM2GR
+=====
 
 An exploration of algorithms for constructing graphs derived from image-like
-data in parallel. See our [final report](docs/im2gr.pdf) (my senior thesis).
+data in parallel. See our [report](docs/im2gr.pdf) (my senior thesis).
 
-# Examples
-
-## Julia
+### Examples
 ```julia
 using IM2GR
 
@@ -18,33 +16,7 @@ image = im2gr(data, d, <construction mode>, diff_fn, track=true)
 ```
 The result vectors are stored in `image`.
 
-## C++
-### Executable
-```bash
-make im2gr-<mode> && ./bin/im2gr-<mode> <data path> <d>
-```
-Optional `OPT` and `DEBUG` flags can be set for compilation.
-Try `make list` for all compilation options.
-
-### API
-```cpp
-Data *data = new Data(<data path>);
-int d = <d>;
-diff_fn diff = <image diff function>;
-Image image = im2gr(data, d, <construction mode>, diff);
-
-Index *ei = image.get_ei();
-Index *ei = image.get_ei();
-float *evd = image.get_evd();
-float *evi = image.get_evi();
-size_t vc = image.get_vc();   // length of result vectors
-```
-Image diff functions must accept two `float` arguments and have a return type
-of `float`.
-
-# Testing
-
-## Julia
+### Testing
 Use `]` to enter Pkg REPL, and do:
 ```
 pkg> add https://github.com/sinha-abhi/im2gr
@@ -56,9 +28,12 @@ julia> import Pkg; Pkg.add("https://github.com/sinha-abhi/im2gr");
 julia> Pkg.test("IM2GR)
 ```
 
-## C++
-```bash
-make test && ./bin/im2gr-test --log_level=test_suite
-```
-C++ tests use the [Boost Unit Test Framework](https://github.com/boostorg/test).
+### TODO
+ - [ ] Option to construct graphs lazily
+ - [ ] Distributed mode for construction (multi-process)
+ - [ ] Better memory management for CUDA (actually, better memory management in
+   general)
+ - [ ] Use multiple GPUs if available
+ - [ ] Tune CUDA kernel launch
+ - [ ] Batching for larger images
 
