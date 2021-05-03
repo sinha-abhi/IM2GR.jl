@@ -24,7 +24,7 @@ pkg> test
 ```
 or, do:
 ```julia
-julia> import Pkg; Pkg.add("https://github.com/sinha-abhi/im2gr");
+julia> import Pkg; Pkg.add("https://github.com/sinha-abhi/IM2GR.jl");
 julia> Pkg.test("IM2GR)
 ```
 
